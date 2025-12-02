@@ -24,8 +24,13 @@ dns_servers     = ["8.8.8.8", "8.8.4.4"]
 domain          = "internetplus.local"
 
 # SSH настройки
-ssh_public_key = "~/.ssh/id_rsa.pub"  # Путь к публичному ключу или сам ключ
-ssh_user       = "ubuntu"
+# Вариант 1: Путь к файлу с ключом (рекомендуется)
+ssh_public_key_file = "~/.ssh/id_rsa.pub"
+
+# Вариант 2: Прямой ключ (альтернатива)
+# ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."
+
+ssh_user = "ubuntu"
 
 # IP адреса машин
 radius_ip    = "192.168.10.10"
