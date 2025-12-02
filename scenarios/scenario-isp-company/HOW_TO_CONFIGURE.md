@@ -376,9 +376,31 @@ infrastructure_servers:
 
 Установите `enabled: false` для всех уязвимостей этой машины или закомментируйте секцию.
 
+## Учетные записи администраторов платформы
+
+На всех машинах созданы учетные записи администраторов платформы для управления:
+
+- **Основной администратор**: `platform-admin` / `PlatformAdmin123!`
+- **Резервный администратор**: `backup-admin` / `BackupAdmin123!`
+
+Подробная информация: `infrastructure/ansible/PLATFORM_ADMINS.md`
+
+### Изменение паролей администраторов
+
+В файле `vulnerabilities.yml`:
+
+```yaml
+platform_admins:
+  primary_admin:
+    password: "YourNewPassword123!"  # Измените здесь
+  backup_admin:
+    password: "YourNewBackupPassword123!"  # Измените здесь
+```
+
 ## Дополнительные ресурсы
 
 - **Подробная документация**: `infrastructure/ansible/README_VULNERABILITIES.md`
+- **Учетные записи администраторов**: `infrastructure/ansible/PLATFORM_ADMINS.md`
 - **Описание машин**: `machine-scenarios.md`
 - **Сетевая топология**: `network-topology.md`
 - **Документация Ansible**: https://docs.ansible.com/

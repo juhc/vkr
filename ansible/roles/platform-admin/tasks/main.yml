@@ -1,0 +1,100 @@
+---
+# Ansible роль: Создание учетных записей администраторов платформы
+# Эта роль создает учетные записи администраторов на всех машинах для доступа к платформе
+
+- name: Создание группы администраторов платформы
+  group:
+    name: platform-admins
+    state: present
+  become: yes
+
+- name: Создание учетных записей администраторов платформы
+  user:
+    name: "{{ item.username }}"
+    password: "{{ item.password | password_hash('sha512') }}"
+    groups: "{{ item.groups | default(['platform-admins']) }}"
+    append: yes
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    home: "{{ item.home_directory | default('/home/' + item.username) }}"
+    create_home: yes
+    state: present
+  loop: "{{ platform_admin_accounts }}"
+  become: yes
+  no_log: true
+
+- name: Настройка sudo доступа для администраторов платформы
+  lineinfile:
+    path: /etc/sudoers.d/platform-admins
+    line: "{{ item.username }} ALL=(ALL:ALL) NOPASSWD: ALL"
+    create: yes
+    mode: '0440'
+    validate: 'visudo -cf %s'
+  loop: "{{ platform_admin_accounts }}"
+  when: item.sudo_access | default(true)
+  become: yes
+
+- name: Создание директории .ssh для администраторов
+  file:
+    path: "{{ item.home_directory | default('/home/' + item.username) }}/.ssh"
+    state: directory
+    mode: '0700'
+    owner: "{{ item.username }}"
+    group: "{{ item.username }}"
+  loop: "{{ platform_admin_accounts }}"
+  become: yes
+
+- name: Настройка SSH ключей для администраторов (если указаны)
+  authorized_key:
+    user: "{{ item.username }}"
+    key: "{{ item.ssh_key }}"
+    state: present
+    exclusive: false
+  loop: "{{ platform_admin_accounts }}"
+  when: item.ssh_key is defined and item.ssh_key != ""
+  become: yes
+
+- name: Настройка SSH для доступа администраторов
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backup: yes
+  loop:
+    - { regexp: "^#?PasswordAuthentication", line: "PasswordAuthentication {{ ssh_password_auth | default('yes') }}" }
+    - { regexp: "^#?PubkeyAuthentication", line: "PubkeyAuthentication {{ ssh_key_auth | default('yes') }}" }
+    - { regexp: "^#?PermitRootLogin", line: "PermitRootLogin {{ permit_root_login | default('no') }}" }
+  become: yes
+  notify: restart ssh
+
+- name: Создание файла с информацией о доступе
+  copy:
+    content: |
+      # Учетные записи администраторов платформы
+      
+      ## Основной администратор
+      Username: {{ platform_admin_accounts[0].username }}
+      Password: {{ platform_admin_accounts[0].password }}
+      SSH: ssh {{ platform_admin_accounts[0].username }}@{{ ansible_default_ipv4.address }}
+      
+      {% if platform_admin_accounts | length > 1 %}
+      ## Резервный администратор
+      Username: {{ platform_admin_accounts[1].username }}
+      Password: {{ platform_admin_accounts[1].password }}
+      SSH: ssh {{ platform_admin_accounts[1].username }}@{{ ansible_default_ipv4.address }}
+      {% endif %}
+      
+      ## Доступ к машине
+      IP адрес: {{ ansible_default_ipv4.address }}
+      Hostname: {{ ansible_hostname }}
+      
+      ## Важно
+      - Измените пароли после первого входа
+      - Используйте SSH ключи для безопасного доступа
+      - Не используйте эти учетные записи для эксплуатации уязвимостей
+    dest: /home/{{ platform_admin_accounts[0].username }}/ACCESS_INFO.txt
+    mode: '0600'
+    owner: "{{ platform_admin_accounts[0].username }}"
+    group: "{{ platform_admin_accounts[0].username }}"
+  become: yes
+  when: platform_admin_accounts | length > 0
+

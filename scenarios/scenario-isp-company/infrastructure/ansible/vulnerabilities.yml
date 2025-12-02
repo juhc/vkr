@@ -16,11 +16,53 @@ global:
   # Отключить автоматические обновления
   disable_auto_updates: true
 
+# Учетные записи администраторов платформы
+# Эти учетные записи создаются на всех машинах для доступа администраторов платформы
+platform_admins:
+  # Основной администратор платформы
+  primary_admin:
+    username: "platform-admin"
+    password: "PlatformAdmin123!"
+    ssh_key: ""  # Можно добавить SSH ключ для безопасного доступа
+    sudo_access: true
+    groups: ["sudo", "adm"]
+    shell: "/bin/bash"
+    home_directory: "/home/platform-admin"
+  
+  # Резервный администратор
+  backup_admin:
+    username: "backup-admin"
+    password: "BackupAdmin123!"
+    ssh_key: ""
+    sudo_access: true
+    groups: ["sudo"]
+    shell: "/bin/bash"
+    home_directory: "/home/backup-admin"
+  
+  # Настройки доступа
+  access_settings:
+    # Разрешить SSH доступ по паролю
+    ssh_password_auth: true
+    # Разрешить SSH доступ по ключам
+    ssh_key_auth: true
+    # Разрешить root доступ через SSH
+    permit_root_login: false
+    # Порт SSH
+    ssh_port: 22
+
 # Уязвимости для инфраструктурных серверов
 infrastructure_servers:
   radius_server:
     ip: "192.168.10.10"
     hostname: "radius-server"
+    
+    # Учетные записи администраторов платформы
+    platform_admins:
+      enabled: true
+      accounts:
+        - username: "{{ platform_admins.primary_admin.username }}"
+          password: "{{ platform_admins.primary_admin.password }}"
+          sudo_access: true
     
     vulnerabilities:
       # Слабый пароль базы данных
@@ -49,6 +91,14 @@ service_servers:
   billing_server:
     ip: "192.168.20.10"
     hostname: "billing-server"
+    
+    # Учетные записи администраторов платформы
+    platform_admins:
+      enabled: true
+      accounts:
+        - username: "{{ platform_admins.primary_admin.username }}"
+          password: "{{ platform_admins.primary_admin.password }}"
+          sudo_access: true
     
     vulnerabilities:
       # SQL инъекции
@@ -82,6 +132,14 @@ service_servers:
   web_server:
     ip: "192.168.20.20"
     hostname: "web-server"
+    
+    # Учетные записи администраторов платформы
+    platform_admins:
+      enabled: true
+      accounts:
+        - username: "{{ platform_admins.primary_admin.username }}"
+          password: "{{ platform_admins.primary_admin.password }}"
+          sudo_access: true
     
     vulnerabilities:
       # Уязвимая версия WordPress
@@ -118,6 +176,17 @@ management_servers:
     ip: "192.168.30.10"
     hostname: "monitoring-server"
     
+    # Учетные записи администраторов платформы
+    platform_admins:
+      enabled: true
+      accounts:
+        - username: "platform-admin"
+          password: "PlatformAdmin123!"
+          sudo_access: true
+        - username: "backup-admin"
+          password: "BackupAdmin123!"
+          sudo_access: true
+    
     vulnerabilities:
       # Слабые SNMP community strings
       weak_snmp_communities:
@@ -143,6 +212,17 @@ management_servers:
   jump_server:
     ip: "192.168.30.20"
     hostname: "jump-server"
+    
+    # Учетные записи администраторов платформы
+    platform_admins:
+      enabled: true
+      accounts:
+        - username: "platform-admin"
+          password: "PlatformAdmin123!"
+          sudo_access: true
+        - username: "backup-admin"
+          password: "BackupAdmin123!"
+          sudo_access: true
     
     vulnerabilities:
       # Доступ по паролю
