@@ -60,8 +60,8 @@ infrastructure_servers:
     platform_admins:
       enabled: true
       accounts:
-        - username: "{{ platform_admins.primary_admin.username }}"
-          password: "{{ platform_admins.primary_admin.password }}"
+        - username: "platform-admin"
+          password: "PlatformAdmin123!"
           sudo_access: true
     
     vulnerabilities:
@@ -137,8 +137,8 @@ service_servers:
     platform_admins:
       enabled: true
       accounts:
-        - username: "{{ platform_admins.primary_admin.username }}"
-          password: "{{ platform_admins.primary_admin.password }}"
+        - username: "platform-admin"
+          password: "PlatformAdmin123!"
           sudo_access: true
     
     vulnerabilities:
