@@ -83,16 +83,16 @@
                           |
                   [Core Router]
                           |
-        +-----------------+-----------------+-----------------+
-        |                 |                 |                 |
-    [Client]         [Infrastructure]    [Services]       [Management]
-    Network              Network          Network          Network
-  (10.0.0.0/8)      (192.168.10.0/24) (192.168.20.0/24) (192.168.30.0/24)
-        |                 |                 |                 |
-    +---+---+         +---+---+         +---+---+         +---+---+
-    |       |         |       |         |       |         |       |
-  PPPoE  DHCP    RADIUS  DNS  Billing  Web  Mail  Monitoring  Admin
-  Server Server  Server Server Server Server Server  Server  Server
+        +-----------------+-----------------+-----------------+-----------------+
+        |                 |                 |                 |                 |
+    [Client]         [Infrastructure]    [Services]       [Management]      [Attacker]
+    Network              Network          Network          Network          Network
+  (10.0.0.0/8)      (192.168.10.0/24) (192.168.20.0/24) (192.168.30.0/24) (192.168.50.0/24)
+        |                 |                 |                 |                 |
+    +---+---+         +---+---+         +---+---+         +---+---+         +---+---+
+    |       |         |       |         |       |         |       |         |       |
+  PPPoE  DHCP    RADIUS  DNS  Billing  Web  Mail  Monitoring  Admin      Kali Linux
+  Server Server  Server Server Server Server Server  Server  Server      Pentest Box
 ```
 
 ### Сетевые сегменты
@@ -176,6 +176,18 @@
   - Роль: Резервное копирование всех систем
   - Сервисы: Rsync, BackupPC
   - Уязвимости: Нешифрованные бэкапы, слабые пароли SSH
+
+#### 5. Сеть атакующего (Attacker Network) - 192.168.50.0/24
+**Назначение**: Машина для проведения тестирования на проникновение  
+**Изоляция**: Отдельная сеть с доступом ко всем тестируемым сетям
+
+**Устройства**:
+- **Kali Linux Pentest Box** (192.168.50.10)
+  - ОС: Kali Linux (последняя версия)
+  - Роль: Машина атакующего для проведения пентеста
+  - Сервисы: Предустановленные инструменты для тестирования на проникновение
+  - Доступ: Доступ ко всем сетям инфраструктуры для тестирования
+  - Инструменты: Nmap, Metasploit, Burp Suite, SQLMap, Hydra, John the Ripper, Wireshark и др.
 
 ## Типичные уязвимости и ошибки
 
