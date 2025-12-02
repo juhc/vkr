@@ -23,7 +23,13 @@ platform_admins:
   primary_admin:
     username: "platform-admin"
     password: "PlatformAdmin123!"
-    ssh_key: ""  # Можно добавить SSH ключ для безопасного доступа
+    # SSH ключ для безопасного доступа (можно указать несколькими способами):
+    # 1. Прямой публичный ключ (одна строка):
+    ssh_key: ""
+    # 2. Путь к файлу с публичным ключом (относительно директории ansible):
+    ssh_key_file: ""  # Например: "../../keys/platform_admin_key.pub"
+    # 3. Список ключей (для нескольких администраторов):
+    ssh_keys: []
     sudo_access: true
     groups: ["sudo", "adm"]
     shell: "/bin/bash"
@@ -33,7 +39,10 @@ platform_admins:
   backup_admin:
     username: "backup-admin"
     password: "BackupAdmin123!"
+    # SSH ключ для безопасного доступа
     ssh_key: ""
+    ssh_key_file: ""  # Путь к файлу с ключом
+    ssh_keys: []
     sudo_access: true
     groups: ["sudo"]
     shell: "/bin/bash"
@@ -41,7 +50,7 @@ platform_admins:
   
   # Настройки доступа
   access_settings:
-    # Разрешить SSH доступ по паролю
+    # Разрешить SSH доступ по паролю (рекомендуется отключить после настройки ключей)
     ssh_password_auth: true
     # Разрешить SSH доступ по ключам
     ssh_key_auth: true
@@ -49,6 +58,8 @@ platform_admins:
     permit_root_login: false
     # Порт SSH
     ssh_port: 22
+    # Отключить доступ по паролю после настройки ключей (автоматически)
+    disable_password_auth_after_keys: false
 
 # Уязвимости для инфраструктурных серверов
 infrastructure_servers:

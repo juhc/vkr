@@ -43,14 +43,54 @@
   loop: "{{ platform_admin_accounts }}"
   become: yes
 
-- name: Настройка SSH ключей для администраторов (если указаны)
+- name: Инициализация списка SSH ключей для каждого администратора
+  set_fact:
+    admin_ssh_keys: "{{ admin_ssh_keys | default({}) | combine({item.username: []}) }}"
+  loop: "{{ platform_admin_accounts }}"
+
+- name: Загрузка SSH ключа из файла (если указан путь)
+  slurp:
+    src: "{{ item.ssh_key_file }}"
+  loop: "{{ platform_admin_accounts }}"
+  when: item.ssh_key_file is defined and item.ssh_key_file != ""
+  register: ssh_key_files
+  become: no
+  delegate_to: localhost
+  changed_when: false
+
+- name: Добавление прямого SSH ключа в список
+  set_fact:
+    admin_ssh_keys: "{{ admin_ssh_keys | combine({item.username: admin_ssh_keys[item.username] + [item.ssh_key]}) }}"
+  loop: "{{ platform_admin_accounts }}"
+  when: item.ssh_key is defined and item.ssh_key != "" and item.ssh_key | trim != ""
+
+- name: Добавление SSH ключа из файла в список
+  set_fact:
+    admin_ssh_keys: "{{ admin_ssh_keys | combine({item.username: admin_ssh_keys[item.username] + [lookup('file', item.ssh_key_file) | trim]}) }}"
+  loop: "{{ platform_admin_accounts }}"
+  when: 
+    - item.ssh_key_file is defined
+    - item.ssh_key_file != ""
+    - lookup('file', item.ssh_key_file, errors='ignore') != ""
+
+- name: Добавление списка SSH ключей
+  set_fact:
+    admin_ssh_keys: "{{ admin_ssh_keys | combine({item.username: admin_ssh_keys[item.username] + item.ssh_keys}) }}"
+  loop: "{{ platform_admin_accounts }}"
+  when: item.ssh_keys is defined and item.ssh_keys | length > 0
+
+- name: Настройка SSH ключей для администраторов
   authorized_key:
-    user: "{{ item.username }}"
-    key: "{{ item.ssh_key }}"
+    user: "{{ item.0.username }}"
+    key: "{{ item.1 }}"
     state: present
     exclusive: false
-  loop: "{{ platform_admin_accounts }}"
-  when: item.ssh_key is defined and item.ssh_key != ""
+  loop: "{{ platform_admin_accounts | product(admin_ssh_keys[item.username] | default([])) | list }}"
+  when: 
+    - admin_ssh_keys[item.0.username] is defined
+    - admin_ssh_keys[item.0.username] | length > 0
+    - item.1 is defined
+    - item.1 != ""
   become: yes
 
 - name: Настройка SSH для доступа администраторов
