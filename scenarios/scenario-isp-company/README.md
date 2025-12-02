@@ -312,4 +312,35 @@
 **Уровень**: Продвинутый  
 **Время**: 4-5 часов
 
+## Управление уязвимостями и настройками
+
+Все уязвимости и настройки машин можно легко изменять через конфигурационный файл `infrastructure/ansible/vulnerabilities.yml`.
+
+### Основные возможности:
+
+- **Включение/отключение уязвимостей**: Каждая уязвимость может быть включена или отключена независимо
+- **Изменение паролей**: Легко изменять пароли для различных сервисов
+- **Настройка уровня сложности**: Установить уровень сложности (beginner/intermediate/advanced)
+- **Гранулярное управление**: Управлять отдельными аспектами уязвимостей
+
+### Быстрый старт:
+
+1. **Отредактировать конфигурацию**:
+   ```bash
+   nano scenarios/scenario-isp-company/infrastructure/ansible/vulnerabilities.yml
+   ```
+
+2. **Использовать скрипт управления**:
+   ```bash
+   cd scenarios/scenario-isp-company/infrastructure/ansible/scripts
+   ./manage-vulnerabilities.sh help
+   ```
+
+3. **Применить изменения**:
+   ```bash
+   ./manage-vulnerabilities.sh apply
+   ```
+
+Подробная документация находится в файле `infrastructure/ansible/README_VULNERABILITIES.md`.
+
 
