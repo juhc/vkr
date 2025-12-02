@@ -6,6 +6,43 @@ variable "proxmox_api_url" {
   type        = string
 }
 
+# Флаги включения/отключения машин (для тестирования с ограниченными ресурсами)
+variable "enable_radius_server" {
+  description = "Создать RADIUS сервер"
+  type        = bool
+  default     = true
+}
+
+variable "enable_billing_server" {
+  description = "Создать биллинговый сервер"
+  type        = bool
+  default     = true
+}
+
+variable "enable_web_server" {
+  description = "Создать веб-сервер"
+  type        = bool
+  default     = true
+}
+
+variable "enable_monitoring_server" {
+  description = "Создать сервер мониторинга"
+  type        = bool
+  default     = true
+}
+
+variable "enable_jump_server" {
+  description = "Создать jump-сервер"
+  type        = bool
+  default     = true
+}
+
+variable "enable_kali_attacker" {
+  description = "Создать машину атакующего (Kali Linux)"
+  type        = bool
+  default     = true
+}
+
 variable "proxmox_api_token_id" {
   description = "ID токена API Proxmox (формат: user@realm!token-name)"
   type        = string

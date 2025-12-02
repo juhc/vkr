@@ -34,6 +34,8 @@ provider "proxmox" {
 
 # RADIUS сервер
 module "radius_server" {
+  count = var.enable_radius_server ? 1 : 0
+  
   source = "../../../../terraform/modules/proxmox-vm"
   
   vm_name      = "radius-server"
@@ -61,6 +63,8 @@ module "radius_server" {
 
 # Биллинговый сервер
 module "billing_server" {
+  count = var.enable_billing_server ? 1 : 0
+  
   source = "../../../../terraform/modules/proxmox-vm"
   
   vm_name      = "billing-server"
@@ -88,6 +92,8 @@ module "billing_server" {
 
 # Веб-сервер
 module "web_server" {
+  count = var.enable_web_server ? 1 : 0
+  
   source = "../../../../terraform/modules/proxmox-vm"
   
   vm_name      = "web-server"
@@ -115,6 +121,8 @@ module "web_server" {
 
 # Сервер мониторинга
 module "monitoring_server" {
+  count = var.enable_monitoring_server ? 1 : 0
+  
   source = "../../../../terraform/modules/proxmox-vm"
   
   vm_name      = "monitoring-server"
@@ -142,6 +150,8 @@ module "monitoring_server" {
 
 # Jump-сервер
 module "jump_server" {
+  count = var.enable_jump_server ? 1 : 0
+  
   source = "../../../../terraform/modules/proxmox-vm"
   
   vm_name      = "jump-server"
@@ -169,6 +179,8 @@ module "jump_server" {
 
 # Машина атакующего (Kali Linux)
 module "kali_attacker" {
+  count = var.enable_kali_attacker ? 1 : 0
+  
   source = "../../../../terraform/modules/proxmox-vm"
   
   vm_name      = "kali-attacker"
@@ -198,24 +210,24 @@ module "kali_attacker" {
 output "vm_ips" {
   description = "IP адреса всех виртуальных машин"
   value = {
-    radius_server    = module.radius_server.vm_ips[0]
-    billing_server   = module.billing_server.vm_ips[0]
-    web_server       = module.web_server.vm_ips[0]
-    monitoring_server = module.monitoring_server.vm_ips[0]
-    jump_server       = module.jump_server.vm_ips[0]
-    kali_attacker     = module.kali_attacker.vm_ips[0]
+    radius_server    = var.enable_radius_server ? module.radius_server[0].vm_ips[0] : null
+    billing_server   = var.enable_billing_server ? module.billing_server[0].vm_ips[0] : null
+    web_server       = var.enable_web_server ? module.web_server[0].vm_ips[0] : null
+    monitoring_server = var.enable_monitoring_server ? module.monitoring_server[0].vm_ips[0] : null
+    jump_server       = var.enable_jump_server ? module.jump_server[0].vm_ips[0] : null
+    kali_attacker     = var.enable_kali_attacker ? module.kali_attacker[0].vm_ips[0] : null
   }
 }
 
 output "vm_names" {
   description = "Имена всех виртуальных машин"
   value = {
-    radius_server    = module.radius_server.vm_names[0]
-    billing_server   = module.billing_server.vm_names[0]
-    web_server       = module.web_server.vm_names[0]
-    monitoring_server = module.monitoring_server.vm_names[0]
-    jump_server       = module.jump_server.vm_names[0]
-    kali_attacker     = module.kali_attacker.vm_names[0]
+    radius_server    = var.enable_radius_server ? module.radius_server[0].vm_names[0] : null
+    billing_server   = var.enable_billing_server ? module.billing_server[0].vm_names[0] : null
+    web_server       = var.enable_web_server ? module.web_server[0].vm_names[0] : null
+    monitoring_server = var.enable_monitoring_server ? module.monitoring_server[0].vm_names[0] : null
+    jump_server       = var.enable_jump_server ? module.jump_server[0].vm_names[0] : null
+    kali_attacker     = var.enable_kali_attacker ? module.kali_attacker[0].vm_names[0] : null
   }
 }
 
