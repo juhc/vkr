@@ -1,5 +1,23 @@
 # Руководство по развертыванию инфраструктуры ISP компании
 
+## Выбор платформы виртуализации
+
+Инфраструктура может быть развернута на двух платформах:
+
+1. **Proxmox VE** (рекомендуется для удаленного развертывания) - см. [terraform/proxmox/README.md](infrastructure/terraform/proxmox/README.md)
+2. **libvirt/KVM** (для локального развертывания) - см. раздел ниже
+
+Для развертывания на **Proxmox** перейдите в директорию:
+```bash
+cd infrastructure/terraform/proxmox
+```
+
+Следуйте инструкциям в [README.md](infrastructure/terraform/proxmox/README.md) и [PROXMOX_SETUP.md](infrastructure/terraform/proxmox/PROXMOX_SETUP.md).
+
+---
+
+## Развертывание на libvirt/KVM (локальное)
+
 ## Требования к системе
 
 ### Минимальные требования
