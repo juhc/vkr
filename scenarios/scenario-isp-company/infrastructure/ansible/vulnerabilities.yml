@@ -1,5 +1,6 @@
 # Конфигурация уязвимостей для сценария ISP-компании
 # Этот файл позволяет включать/отключать уязвимости и изменять настройки машин
+# Сценарий упрощен и содержит только 5 ключевых машин инфраструктуры
 
 # Общие настройки
 global:
@@ -15,55 +16,10 @@ global:
   # Отключить автоматические обновления
   disable_auto_updates: true
 
-# Уязвимости для клиентских серверов
-client_servers:
-  pppoe_server:
-    ip: "192.168.10.10"
-    hostname: "pppoe-server"
-    
-    vulnerabilities:
-      # Слабые пароли
-      weak_passwords:
-        enabled: true
-        root_password: "admin123"
-        user_passwords:
-          admin: "admin123"
-          operator: "operator123"
-      
-      # Открытые порты управления
-      open_management_ports:
-        enabled: true
-        ssh_from_client_network: true
-        web_interface_without_auth: true
-        snmp_public_community: "public"
-      
-      # Небезопасная конфигурация PPPoE
-      insecure_pppoe_config:
-        enabled: true
-        rate_limiting_disabled: true
-        unlimited_connections: true
-        no_monitoring: true
-
-  dhcp_server:
-    ip: "192.168.10.20"
-    hostname: "dhcp-server"
-    
-    vulnerabilities:
-      # Отсутствие rate limiting
-      no_rate_limiting:
-        enabled: true
-      
-      # Небезопасная конфигурация DHCP
-      insecure_dhcp_config:
-        enabled: true
-        no_authentication: true
-        wide_ip_range: true
-        no_mac_filtering: true
-
 # Уязвимости для инфраструктурных серверов
 infrastructure_servers:
   radius_server:
-    ip: "192.168.10.30"
+    ip: "192.168.10.10"
     hostname: "radius-server"
     
     vulnerabilities:
@@ -87,49 +43,6 @@ infrastructure_servers:
         plaintext_passwords: true
         sensitive_data_in_logs: true
         no_encryption: true
-
-  dns_server:
-    ip: "192.168.10.40"
-    hostname: "dns-server"
-    
-    vulnerabilities:
-      # Открытый рекурсивный DNS
-      open_recursive_dns:
-        enabled: true
-        allow_all_recursive: true
-        no_rate_limiting: true
-      
-      # Небезопасная конфигурация
-      insecure_dns_config:
-        enabled: true
-        open_zone_transfer: true
-        no_dns_cache_poisoning_protection: true
-        weak_tsig_keys: true
-      
-      # Раскрытие информации
-      information_disclosure:
-        enabled: true
-        enumerate_internal_hosts: true
-        reveal_bind_version: true
-        public_zone_info: true
-
-  ntp_server:
-    ip: "192.168.10.50"
-    hostname: "ntp-server"
-    
-    vulnerabilities:
-      # Открытый доступ
-      open_access:
-        enabled: true
-        allow_all_clients: true
-        no_authentication: true
-      
-      # Небезопасная конфигурация
-      insecure_ntp_config:
-        enabled: true
-        no_rate_limiting: true
-        open_monlist: true
-        weak_time_sources: true
 
 # Уязвимости для сервисных серверов
 service_servers:
@@ -199,59 +112,6 @@ service_servers:
         server_signature_on: true
         open_directories: true
 
-  mail_server:
-    ip: "192.168.20.30"
-    hostname: "mail-server"
-    
-    vulnerabilities:
-      # Открытый релей
-      open_relay:
-        enabled: true
-        smtp_relay_for_all: true
-        no_auth_for_local: true
-        spam_possibility: true
-      
-      # Слабые пароли
-      weak_passwords:
-        enabled: true
-        simple_mailbox_passwords: true
-        default_passwords: true
-        no_password_policy: true
-      
-      # Устаревшие протоколы
-      outdated_protocols:
-        enabled: true
-        tls_1_0_support: true
-        tls_1_1_support: true
-        weak_cipher_suites: true
-        no_forced_tls: true
-
-  crm_server:
-    ip: "192.168.20.40"
-    hostname: "crm-server"
-    
-    vulnerabilities:
-      # Уязвимая версия CRM
-      vulnerable_crm:
-        enabled: true
-        outdated_version: true
-        unpatched_components: true
-        security_updates_disabled: true
-      
-      # Слабые пароли администраторов
-      weak_admin_passwords:
-        enabled: true
-        simple_admin_passwords: true
-        default_passwords: true
-        no_2fa: true
-      
-      # Утечка данных клиентов
-      client_data_leak:
-        enabled: true
-        plaintext_personal_data: true
-        no_encryption: true
-        wide_data_access: true
-
 # Уязвимости для управляющих серверов
 management_servers:
   monitoring_server:
@@ -278,7 +138,7 @@ management_servers:
         enabled: true
         sensitive_metrics: true
         unrestricted_logs: true
-        network_equipment_info: true
+        server_info: true
 
   jump_server:
     ip: "192.168.30.20"
@@ -305,32 +165,6 @@ management_servers:
         unrestricted_access: true
         no_session_audit: true
         no_time_restrictions: true
-
-  backup_server:
-    ip: "192.168.30.30"
-    hostname: "backup-server"
-    
-    vulnerabilities:
-      # SSH доступ по паролю
-      ssh_password_auth:
-        enabled: true
-        key_auth_disabled: true
-        weak_passwords: true
-        no_bruteforce_protection: true
-      
-      # Нешифрованные бэкапы
-      unencrypted_backups:
-        enabled: true
-        backups_without_encryption: true
-        open_backup_access: true
-        sensitive_data_in_backups: true
-      
-      # Отсутствие контроля доступа
-      no_access_control:
-        enabled: true
-        wide_backup_access: true
-        no_access_audit: true
-        no_permission_separation: true
 
 # Уязвимости для машины атакующего
 attacker_machine:
@@ -371,17 +205,15 @@ network_vulnerabilities:
   # Открытые порты
   open_ports:
     enabled: true
-    rdp_from_internet: true
     ssh_without_restrictions: true
     web_interfaces_without_auth: true
+    database_ports_accessible: true
   
   # Небезопасные протоколы
   insecure_protocols:
     enabled: true
-    telnet_instead_ssh: true
     http_instead_https: true
-    smbv1_enabled: true
-    ntlm_instead_kerberos: true
+    no_encryption_for_db: true
 
 # Настройки для обучения
 learning_settings:
@@ -396,4 +228,3 @@ learning_settings:
   
   # Включить подсказки в системе
   enable_hints: false
-
