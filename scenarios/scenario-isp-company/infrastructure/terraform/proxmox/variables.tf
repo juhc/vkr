@@ -74,7 +74,13 @@ variable "domain" {
 
 # SSH настройки
 variable "ssh_public_key" {
-  description = "SSH публичный ключ для доступа к ВМ"
+  description = "SSH публичный ключ для доступа к ВМ (можно указать путь к файлу или сам ключ)"
+  type        = string
+  default     = ""
+}
+
+variable "ssh_public_key_file" {
+  description = "Путь к файлу с SSH публичным ключом (альтернатива ssh_public_key)"
   type        = string
   default     = ""
 }

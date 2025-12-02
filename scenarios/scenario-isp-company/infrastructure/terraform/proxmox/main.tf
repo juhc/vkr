@@ -53,7 +53,7 @@ module "radius_server" {
   hostname = "radius-server"
   domain   = var.domain
   
-  ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : var.ssh_public_key
+  ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : (var.ssh_public_key != "" ? var.ssh_public_key : "")
   ssh_user       = var.ssh_user
   
   vlan_tag = var.radius_vlan_tag
@@ -80,7 +80,7 @@ module "billing_server" {
   hostname = "billing-server"
   domain   = var.domain
   
-  ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : var.ssh_public_key
+  ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : (var.ssh_public_key != "" ? var.ssh_public_key : "")
   ssh_user       = var.ssh_user
   
   vlan_tag = var.billing_vlan_tag
@@ -107,7 +107,7 @@ module "web_server" {
   hostname = "web-server"
   domain   = var.domain
   
-  ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : var.ssh_public_key
+  ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : (var.ssh_public_key != "" ? var.ssh_public_key : "")
   ssh_user       = var.ssh_user
   
   vlan_tag = var.web_vlan_tag
@@ -134,7 +134,7 @@ module "monitoring_server" {
   hostname = "monitoring-server"
   domain   = var.domain
   
-  ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : var.ssh_public_key
+  ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : (var.ssh_public_key != "" ? var.ssh_public_key : "")
   ssh_user       = var.ssh_user
   
   vlan_tag = var.monitoring_vlan_tag
@@ -161,7 +161,7 @@ module "jump_server" {
   hostname = "jump-server"
   domain   = var.domain
   
-  ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : var.ssh_public_key
+  ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : (var.ssh_public_key != "" ? var.ssh_public_key : "")
   ssh_user       = var.ssh_user
   
   vlan_tag = var.jump_vlan_tag
