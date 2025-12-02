@@ -1,0 +1,259 @@
+---
+# Главный плейбук для развертывания инфраструктуры офисной организации
+# Этот плейбук настраивает серверы с типичными уязвимостями для обучения
+
+- name: Базовая настройка всех серверов
+  hosts: all
+  become: yes
+  gather_facts: yes
+  
+  pre_tasks:
+    - name: Обновление информации о пакетах
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+      ignore_errors: yes
+    
+    - name: Установка базовых пакетов
+      apt:
+        name:
+          - curl
+          - wget
+          - net-tools
+          - openssh-server
+          - python3
+          - python3-pip
+        state: present
+      when: ansible_os_family == "Debian"
+    
+    - name: Настройка часового пояса
+      timezone:
+        name: Europe/Moscow
+    
+    - name: Создание базовых пользователей организации
+      user:
+        name: "{{ item.name }}"
+        password: "{{ item.password | password_hash('sha512') }}"
+        shell: /bin/bash
+        groups: sudo
+        append: yes
+      loop:
+        - { name: "director", password: "director123" }
+        - { name: "admin", password: "admin123" }
+        - { name: "dev1", password: "dev123" }
+        - { name: "dev2", password: "dev123" }
+        - { name: "dev3", password: "dev123" }
+        - { name: "devops", password: "devops123" }
+        - { name: "support", password: "support123" }
+      when: ansible_os_family == "Debian"
+      ignore_errors: yes
+    
+    - name: Настройка SSH для демонстрации уязвимостей
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        backup: yes
+      loop:
+        - { regexp: "^#?PermitRootLogin", line: "PermitRootLogin yes" }
+        - { regexp: "^#?PasswordAuthentication", line: "PasswordAuthentication yes" }
+        - { regexp: "^#?PubkeyAuthentication", line: "PubkeyAuthentication yes" }
+      notify: restart ssh
+      when: ansible_os_family == "Debian"
+    
+    - name: Отключение автоматических обновлений безопасности
+      file:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        state: absent
+      when: ansible_os_family == "Debian"
+      ignore_errors: yes
+
+- name: Настройка веб-сервера с Log4Shell
+  hosts: web-server
+  become: yes
+  
+  roles:
+    - role: web-server-apache
+
+- name: Настройка файлового сервера
+  hosts: file-server
+  become: yes
+  
+  roles:
+    - role: file-server-samba
+
+- name: Настройка сервера базы данных
+  hosts: db-server
+  become: yes
+  
+  roles:
+    - role: database-mysql
+
+- name: Настройка DNS сервера с открытым рекурсивным DNS
+  hosts: dns-server
+  become: yes
+  
+  tasks:
+    - name: Установка BIND9
+      apt:
+        name:
+          - bind9
+          - bind9utils
+          - bind9-doc
+        state: present
+        update_cache: yes
+      become: yes
+    
+    - name: Настройка небезопасной конфигурации BIND9
+      copy:
+        content: |
+          options {
+              directory "/var/cache/bind";
+              recursion yes;
+              allow-recursion { any; };
+              listen-on { any; };
+              allow-query { any; };
+              forwarders {
+                  8.8.8.8;
+                  8.8.4.4;
+              };
+          };
+          
+          zone "techservice.local" {
+              type master;
+              file "/etc/bind/db.techservice.local";
+          };
+          
+          zone "10.168.192.in-addr.arpa" {
+              type master;
+              file "/etc/bind/db.192.168.10";
+          };
+        dest: /etc/bind/named.conf.options
+        mode: '0644'
+        backup: yes
+      become: yes
+      notify: restart bind9
+    
+    - name: Создание зоны techservice.local
+      copy:
+        content: |
+          $TTL 86400
+          @   IN  SOA dns-server.techservice.local. admin.techservice.local. (
+              2024010101  ; Serial
+              3600        ; Refresh
+              1800        ; Retry
+              604800      ; Expire
+              86400       ; Minimum TTL
+          )
+          @       IN  NS  dns-server.techservice.local.
+          @       IN  A   192.168.20.20
+          
+          dns-server      IN  A   192.168.10.30
+          web-server      IN  A   192.168.10.10
+          mail-server     IN  A   192.168.10.20
+          file-server     IN  A   192.168.20.10
+          db-server       IN  A   192.168.20.30
+          backup-server   IN  A   192.168.20.40
+          monitoring-server IN  A   192.168.20.50
+          dev-server      IN  A   192.168.30.10
+          test-server     IN  A   192.168.30.20
+          ci-cd-server    IN  A   192.168.30.30
+          jump-server     IN  A   192.168.40.10
+        dest: /etc/bind/db.techservice.local
+        mode: '0644'
+      become: yes
+      notify: restart bind9
+    
+    - name: Открытие портов DNS
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: "{{ item | ternary('tcp', 'udp') }}"
+      loop:
+        - "53"
+      become: yes
+      ignore_errors: yes
+    
+    - name: Запуск и включение BIND9
+      systemd:
+        name: bind9
+        state: started
+        enabled: yes
+      become: yes
+
+- name: Создание уязвимых конфигураций и файлов
+  hosts: all
+  become: yes
+  
+  tasks:
+    - name: Создание файлов с учетными данными
+      copy:
+        content: |
+          Database credentials:
+          Host: 192.168.20.30
+          User: root
+          Password: root123
+          Database: sensitive_data
+          
+          SMB credentials:
+          Host: 192.168.20.10
+          User: shareuser
+          Password: share123
+        dest: "/home/admin/credentials.txt"
+        owner: admin
+        group: admin
+        mode: '0644'
+      when: ansible_os_family == "Debian"
+    
+    - name: Создание скриптов с учетными данными
+      copy:
+        content: |
+          #!/bin/bash
+          # Скрипт резервного копирования с учетными данными
+          mysqldump -u root -proot123 sensitive_data > /tmp/backup.sql
+          chmod 777 /tmp/backup.sql
+        dest: "/home/admin/backup.sh"
+        owner: admin
+        group: admin
+        mode: '0755'
+      when: ansible_os_family == "Debian"
+    
+    - name: Настройка cron для демонстрации
+      cron:
+        name: "Backup script"
+        minute: "0"
+        hour: "2"
+        job: "/bin/bash /home/admin/backup.sh"
+        user: admin
+      when: ansible_os_family == "Debian"
+
+- name: Финальная проверка
+  hosts: all
+  become: no
+  
+  tasks:
+    - name: Проверка доступности серверов
+      wait_for:
+        host: "{{ ansible_default_ipv4.address }}"
+        port: 22
+        delay: 10
+        timeout: 30
+      delegate_to: localhost
+
+- name: Handlers
+  hosts: all
+  become: yes
+  
+  handlers:
+    - name: restart ssh
+      systemd:
+        name: ssh
+        state: restarted
+      when: ansible_os_family == "Debian"
+    
+    - name: restart bind9
+      systemd:
+        name: bind9
+        state: restarted
+      when: ansible_os_family == "Debian"

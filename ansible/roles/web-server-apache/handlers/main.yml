@@ -1,0 +1,15 @@
+---
+# Handlers для перезапуска Apache
+
+- name: restart apache
+  systemd:
+    name: apache2
+    state: restarted
+  become: yes
+
+- name: reload apache
+  systemd:
+    name: apache2
+    state: reloaded
+  become: yes
+

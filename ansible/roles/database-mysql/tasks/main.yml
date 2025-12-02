@@ -1,0 +1,148 @@
+---
+# Ansible роль: Настройка MySQL сервера со слабыми паролями
+
+- name: Установка MySQL Server
+  apt:
+    name:
+      - mysql-server
+      - mysql-client
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Запуск MySQL
+  systemd:
+    name: mysql
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Ожидание запуска MySQL
+  wait_for:
+    port: 3306
+    delay: 10
+    timeout: 30
+  become: yes
+
+- name: Установка слабого пароля root
+  mysql_user:
+    name: root
+    host: "%"
+    password: root123
+    priv: "*.*:ALL,GRANT"
+    state: present
+  become: yes
+  vars:
+    ansible_become_pass: "{{ ansible_become_pass }}"
+  environment:
+    MYSQL_ROOT_PASSWORD: "root123"
+  no_log: true
+
+- name: Разрешение удаленного доступа для root
+  mysql_user:
+    name: root
+    host: "%"
+    password: root123
+    priv: "*.*:ALL,GRANT"
+    state: present
+  become: yes
+  no_log: true
+
+- name: Создание тестовой базы данных
+  mysql_db:
+    name: sensitive_data
+    state: present
+  become: yes
+
+- name: Создание тестовых таблиц с чувствительными данными
+  mysql_db:
+    name: sensitive_data
+    state: import
+    target: /tmp/init_db.sql
+  become: yes
+  ignore_errors: yes
+
+- name: Создание SQL файла для инициализации БД
+  copy:
+    content: |
+      CREATE DATABASE IF NOT EXISTS sensitive_data;
+      USE sensitive_data;
+      
+      CREATE TABLE IF NOT EXISTS users (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          username VARCHAR(50) NOT NULL,
+          password VARCHAR(255) NOT NULL,
+          email VARCHAR(100),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      
+      CREATE TABLE IF NOT EXISTS financial_data (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          account_number VARCHAR(50) NOT NULL,
+          balance DECIMAL(10,2),
+          owner_name VARCHAR(100),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      
+      INSERT INTO users (username, password, email) VALUES
+          ('admin', 'admin123', 'admin@techservice.local'),
+          ('director', 'director123', 'director@techservice.local'),
+          ('accountant', 'accountant123', 'accountant@techservice.local');
+      
+      INSERT INTO financial_data (account_number, balance, owner_name) VALUES
+          ('ACC001', 100000.00, 'Company Account'),
+          ('ACC002', 50000.00, 'Director Account'),
+          ('ACC003', 25000.00, 'HR Account');
+    dest: /tmp/init_db.sql
+    mode: '0644'
+  become: yes
+
+- name: Импорт данных в базу данных
+  mysql_db:
+    name: sensitive_data
+    state: import
+    target: /tmp/init_db.sql
+  become: yes
+  ignore_errors: yes
+
+- name: Настройка MySQL для удаленного доступа
+  lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backup: yes
+  loop:
+    - { regexp: "^bind-address", line: "bind-address = 0.0.0.0" }
+    - { regexp: "^# skip-networking", line: "# skip-networking" }
+  become: yes
+  notify: restart mysql
+
+- name: Открытие порта MySQL
+  ufw:
+    rule: allow
+    port: "3306"
+    proto: tcp
+  become: yes
+  ignore_errors: yes
+
+- name: Создание информационного файла об уязвимости
+  copy:
+    content: |
+      # Уязвимости MySQL сервера
+      
+      1. Слабый пароль root: root123
+      2. Удаленный доступ root разрешен
+      3. Отсутствие шифрования соединений
+      4. Чувствительные данные в открытом виде
+      
+      Для тестирования:
+      mysql -h 192.168.20.30 -u root -proot123
+      
+      Использование:
+      USE sensitive_data;
+      SELECT * FROM users;
+      SELECT * FROM financial_data;
+    dest: /root/VULNERABILITY_INFO.txt
+    mode: '0644'
+  become: yes
+

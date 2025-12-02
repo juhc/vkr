@@ -1,0 +1,29 @@
+---
+# Шаблон виртуального хоста Apache для уязвимого приложения
+
+<VirtualHost *:8080>
+    ServerName web-server.techservice.local
+    ServerAdmin admin@techservice.local
+    
+    DocumentRoot /var/www/vulnerable-app
+    
+    <Directory /var/www/vulnerable-app>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+    <Directory "/usr/lib/cgi-bin">
+        AllowOverride None
+        Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+        Require all granted
+    </Directory>
+    
+    ErrorLog ${APACHE_LOG_DIR}/vulnerable-app-error.log
+    CustomLog ${APACHE_LOG_DIR}/vulnerable-app-access.log combined
+    
+    # Небезопасная конфигурация для обучения
+    LogLevel debug
+</VirtualHost>
+

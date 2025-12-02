@@ -1,0 +1,161 @@
+---
+# Ansible инвентарь для инфраструктуры офисной организации
+
+all:
+  children:
+    # DMZ серверы
+    dmz_servers:
+      hosts:
+        web-server:
+          ansible_host: 192.168.10.10
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ~/.ssh/lab_key
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+        mail-server:
+          ansible_host: 192.168.10.20
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ~/.ssh/lab_key
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+        dns-server:
+          ansible_host: 192.168.10.30
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ~/.ssh/lab_key
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+      vars:
+        network_segment: "dmz"
+        network_gateway: "192.168.10.1"
+        network_dns: ["192.168.10.30", "192.168.20.20"]
+    
+    # Внутренние серверы
+    internal_servers:
+      hosts:
+        file-server:
+          ansible_host: 192.168.20.10
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ~/.ssh/lab_key
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+        dc-server:
+          ansible_host: 192.168.20.20
+          ansible_user: Administrator
+          ansible_password: "Admin123!"
+          ansible_connection: winrm
+          ansible_winrm_transport: basic
+          ansible_winrm_server_cert_validation: ignore
+        db-server:
+          ansible_host: 192.168.20.30
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ~/.ssh/lab_key
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+        backup-server:
+          ansible_host: 192.168.20.40
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ~/.ssh/lab_key
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+        monitoring-server:
+          ansible_host: 192.168.20.50
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ~/.ssh/lab_key
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+      vars:
+        network_segment: "internal"
+        network_gateway: "192.168.20.1"
+        network_dns: ["192.168.20.20", "192.168.10.30"]
+    
+    # Серверы разработки
+    development_servers:
+      hosts:
+        dev-server:
+          ansible_host: 192.168.30.10
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ~/.ssh/lab_key
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+        test-server:
+          ansible_host: 192.168.30.20
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ~/.ssh/lab_key
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+        ci-cd-server:
+          ansible_host: 192.168.30.30
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ~/.ssh/lab_key
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+      vars:
+        network_segment: "development"
+        network_gateway: "192.168.30.1"
+        network_dns: ["192.168.20.20", "192.168.10.30"]
+    
+    # Управляющие серверы
+    management_servers:
+      hosts:
+        jump-server:
+          ansible_host: 192.168.40.10
+          ansible_user: ubuntu
+          ansible_ssh_private_key_file: ~/.ssh/lab_key
+          ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+      vars:
+        network_segment: "management"
+        network_gateway: "192.168.40.1"
+        network_dns: ["192.168.20.20", "192.168.10.30"]
+    
+    # Группы по ролям
+    web_servers:
+      hosts:
+        web-server:
+    
+    database_servers:
+      hosts:
+        db-server:
+    
+    file_servers:
+      hosts:
+        file-server:
+    
+    mail_servers:
+      hosts:
+        mail-server:
+    
+    dns_servers:
+      hosts:
+        dns-server:
+        dc-server:
+    
+    monitoring_servers:
+      hosts:
+        monitoring-server:
+    
+    backup_servers:
+      hosts:
+        backup-server:
+    
+    domain_controllers:
+      hosts:
+        dc-server:
+    
+    development_servers_group:
+      hosts:
+        dev-server:
+        test-server:
+        ci-cd-server:
+  
+  vars:
+    # Общие переменные
+    ansible_python_interpreter: /usr/bin/python3
+    domain_name: "techservice.local"
+    organization_name: "ТехноСервис"
+    
+    # Переменные безопасности (для обучения - намеренно небезопасные)
+    default_password: "password123"
+    weak_passwords_enabled: true
+    auto_updates_disabled: true
+    
+    # Настройки сети
+    ntp_servers:
+      - "pool.ntp.org"
+      - "time.google.com"
+    
+    # Настройки DNS
+    dns_servers:
+      - "192.168.20.20"
+      - "192.168.10.30"
+      - "8.8.8.8"
+

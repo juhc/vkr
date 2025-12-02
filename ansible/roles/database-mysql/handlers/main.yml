@@ -1,0 +1,9 @@
+---
+# Handlers для перезапуска MySQL
+
+- name: restart mysql
+  systemd:
+    name: mysql
+    state: restarted
+  become: yes
+
