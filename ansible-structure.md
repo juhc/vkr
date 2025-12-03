@@ -88,7 +88,7 @@ diff_lines = cyan
 
 ```
 inventories/
-├── production/                    # Продакшн инвентарь
+├── production/                   # Продакшн инвентарь
 │   ├── hosts.yml                 # Основной файл хостов
 │   ├── group_vars/               # Переменные групп
 │   │   ├── all.yml

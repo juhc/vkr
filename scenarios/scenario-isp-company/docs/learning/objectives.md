@@ -289,4 +289,13 @@
 - [RFC 2131 - DHCP](https://tools.ietf.org/html/rfc2131)
 - [RFC 1035 - DNS](https://tools.ietf.org/html/rfc1035)
 
+---
+
+## Навигация
+
+- **[← Назад к главной](../../README.md)** - главная страница с навигацией
+- **[Обзор сценария](../overview/README.md)** - описание организации и сети
+- **[Чек-листы](../assessment/CHECKLISTS.md)** - критерии оценки работ
+- **[Шаблон отчета](../assessment/REPORT_TEMPLATE.md)** - шаблон для составления отчета
+
 

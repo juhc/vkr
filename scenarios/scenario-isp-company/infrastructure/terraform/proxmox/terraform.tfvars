@@ -73,11 +73,11 @@ kali_disk_size = "100G"
 # Включение/отключение машин (для тестирования с ограниченными ресурсами)
 # Установите false для машин, которые не нужно создавать
 enable_radius_server    = true
-enable_billing_server   = true
-enable_web_server       = true
-enable_monitoring_server = true
-enable_jump_server      = true
-enable_kali_attacker     = true
+enable_billing_server   = false
+enable_web_server       = false
+enable_monitoring_server = false
+enable_jump_server      = false
+enable_kali_attacker     = false
 
 # Для запуска только одной машины, установите все в false, кроме нужной:
 # enable_radius_server    = true
