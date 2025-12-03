@@ -44,7 +44,7 @@ nano terraform.tfvars
 proxmox_api_url          = "https://ВАШ_IP_PROXMOX:8006/api2/json"
 proxmox_api_token_id     = "terraform@pve!terraform-token"
 proxmox_api_token_secret = "ВАШ_СЕКРЕТ_ТОКЕНА"
-proxmox_tls_insecure     = true
+proxmox_tls_insecure     = true  # Установите true для самоподписанных сертификатов
 
 # Узел Proxmox
 proxmox_target_node = "proxmox"  # Или имя вашего узла
@@ -61,7 +61,14 @@ network_gateway = "192.168.10.1"
 dns_servers     = ["8.8.8.8", "8.8.4.4"]
 
 # SSH
-ssh_public_key_file = "~/.ssh/id_rsa.pub"
+# Вариант 1: Прямой ключ (рекомендуется для Windows)
+ssh_public_key = "ssh-rsa AAAAC3NzaC1yc2EAAAADAQABAAACAQ... your-key-here"
+ssh_public_key_file = ""  # Оставьте пустым, если используете ssh_public_key
+
+# Вариант 2: Путь к файлу (для Linux/Mac)
+# ssh_public_key_file = "~/.ssh/id_rsa.pub"
+# ssh_public_key = ""
+
 ssh_user            = "ubuntu"
 
 # ВКЛЮЧИТЬ ТОЛЬКО ОДНУ МАШИНУ ДЛЯ ТЕСТА
@@ -183,6 +190,63 @@ terraform destroy
 - Проверьте правильность токена API
 - Убедитесь, что формат токена: `user@realm!token-name`
 
+### Ошибка: "permissions for user/token are not sufficient"
+
+**Ошибка**: `Error: permissions for user/token root@pam are not sufficient, please provide also the following permissions that are missing: [VM.Monitor]`
+
+**Решение**:
+
+1. **Откройте веб-интерфейс Proxmox**
+
+2. **Перейдите**: `Datacenter → Permissions → API Tokens`
+
+3. **Найдите ваш токен** (например, `root@pam!terraform`)
+
+4. **Нажмите на токен**, чтобы открыть его свойства
+
+5. **Перейдите на вкладку Permissions**
+
+6. **Нажмите Add** и добавьте:
+   - **Path**: `/` (корень Datacenter)
+   - **Role**: `PVEVMAdmin` (включает все необходимые права)
+
+7. **Нажмите Add**
+
+**Альтернатива - минимальные права** (если не хотите использовать PVEVMAdmin):
+- `VM.Monitor` - **обязательно!**
+- `VM.Allocate`
+- `VM.Clone`
+- `VM.Config.Disk`
+- `VM.Config.Network`
+- `VM.PowerMgmt`
+- `Datastore.Allocate`
+
+После настройки прав выполните `terraform plan` снова.
+
+### Ошибка: "check privilege separation of api token"
+
+**Ошибка**: `Error: user terraform@pam has valid credentials but cannot retrieve user list, check privilege separation of api token`
+
+**Решение**:
+
+1. **Откройте веб-интерфейс Proxmox**
+
+2. **Перейдите**: `Datacenter → Permissions → API Tokens`
+
+3. **Найдите ваш токен** (например, `terraform@pam!zxc`)
+
+4. **Нажмите на токен**, чтобы открыть его свойства
+
+5. **Перейдите на вкладку Token**
+
+6. **ОТКЛЮЧИТЕ** опцию **"Privilege Separation"** (снимите галочку)
+
+7. **Сохраните изменения**
+
+**Важно**: Privilege Separation ограничивает права токена и может мешать работе Terraform.
+
+После отключения Privilege Separation выполните `terraform plan` снова.
+
 ### Ошибка: "template not found"
 - Убедитесь, что шаблон `ubuntu-20.04-template` создан в Proxmox
 - Проверьте имя в `proxmox_template_name`
@@ -191,9 +255,14 @@ terraform destroy
 - Уменьшите CPU, RAM или disk_size в terraform.tfvars
 - Проверьте доступные ресурсы в Proxmox
 
+### Ошибка: "certificate signed by unknown authority"
+- Установите `proxmox_tls_insecure = true` в `terraform.tfvars` для самоподписанных сертификатов
+- ⚠️ Используйте только в тестовой среде!
+
 ### Не могу подключиться по SSH
 - Подождите 2-3 минуты после создания (cloud-init)
 - Проверьте, что SSH ключ правильный
+- На Windows используйте полный путь к ключу или укажите ключ напрямую в `ssh_public_key`
 - Попробуйте подключиться через консоль в веб-интерфейсе Proxmox
 
 ## Полезные команды

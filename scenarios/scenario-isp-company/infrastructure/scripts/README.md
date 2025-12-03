@@ -42,6 +42,25 @@ cd scenarios/scenario-isp-company/infrastructure/scripts
 
 Скрипт автоматически создает резервные копии файла `vulnerabilities.yml` перед внесением изменений. Копии сохраняются с временной меткой в имени файла.
 
+## verify-fixes.sh
+
+Скрипт для автоматической проверки исправлений уязвимостей на всех машинах сценария.
+
+### Использование
+
+```bash
+# Проверка всех машин
+./verify-fixes.sh
+
+# Проверка конкретной машины
+./verify-fixes.sh -m radius-server
+
+# С сохранением результатов
+./verify-fixes.sh -o results.txt
+```
+
+**Подробная документация**: См. [VERIFY_FIXES_README.md](VERIFY_FIXES_README.md)
+
 ## Другие скрипты
 
 - `manage-vulnerabilities.sh` - управление уязвимостями через командную строку

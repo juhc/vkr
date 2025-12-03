@@ -5,8 +5,8 @@ terraform {
   
   required_providers {
     proxmox = {
-      source  = "telmate/proxmox"
-      version = "~> 2.9"
+      source  = "Telmate/proxmox"
+      version = "3.0.2-rc05"
     }
   }
   
@@ -36,7 +36,7 @@ provider "proxmox" {
 module "radius_server" {
   count = var.enable_radius_server ? 1 : 0
   
-  source = "../../../../terraform/modules/proxmox-vm"
+  source = "../../../../../terraform/modules/proxmox-vm"
   
   vm_name      = "radius-server"
   target_node = var.proxmox_target_node
@@ -61,127 +61,98 @@ module "radius_server" {
   vlan_tag = var.radius_vlan_tag
 }
 
-# Биллинговый сервер
-module "billing_server" {
-  count = var.enable_billing_server ? 1 : 0
+# Сервер сервисов (объединенный биллинг + веб)
+module "services_server" {
+  count = var.enable_services_server ? 1 : 0
   
-  source = "../../../../terraform/modules/proxmox-vm"
+  source = "../../../../../terraform/modules/proxmox-vm"
   
-  vm_name      = "billing-server"
+  vm_name      = "services-server"
   target_node = var.proxmox_target_node
   template_name = var.proxmox_template_name
   
-  cpu    = var.billing_cpu
-  memory = var.billing_memory
-  disk_size = var.billing_disk_size
+  cpu    = var.services_cpu
+  memory = var.services_memory
+  disk_size = var.services_disk_size
   disk_storage = var.proxmox_disk_storage
   
   network_bridge = var.network_bridge
-  ip_address     = "${var.billing_ip}/24"
+  ip_address     = "${var.services_ip}/24"
   gateway        = var.network_gateway
   dns_servers    = var.dns_servers
   
-  hostname = "billing-server"
+  hostname = "services-server"
   domain   = var.domain
   
   ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : (var.ssh_public_key != "" ? var.ssh_public_key : "")
   ssh_user       = var.ssh_user
   
-  vlan_tag = var.billing_vlan_tag
+  vlan_tag = var.services_vlan_tag
 }
 
-# Веб-сервер
-module "web_server" {
-  count = var.enable_web_server ? 1 : 0
+# Сервер управления (объединенный мониторинг + jump)
+module "management_server" {
+  count = var.enable_management_server ? 1 : 0
   
-  source = "../../../../terraform/modules/proxmox-vm"
+  source = "../../../../../terraform/modules/proxmox-vm"
   
-  vm_name      = "web-server"
+  vm_name      = "management-server"
   target_node = var.proxmox_target_node
   template_name = var.proxmox_template_name
   
-  cpu    = var.web_cpu
-  memory = var.web_memory
-  disk_size = var.web_disk_size
+  cpu    = var.management_cpu
+  memory = var.management_memory
+  disk_size = var.management_disk_size
   disk_storage = var.proxmox_disk_storage
   
   network_bridge = var.network_bridge
-  ip_address     = "${var.web_ip}/24"
+  ip_address     = "${var.management_ip}/24"
   gateway        = var.network_gateway
   dns_servers    = var.dns_servers
   
-  hostname = "web-server"
+  hostname = "management-server"
   domain   = var.domain
   
   ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : (var.ssh_public_key != "" ? var.ssh_public_key : "")
   ssh_user       = var.ssh_user
   
-  vlan_tag = var.web_vlan_tag
+  vlan_tag = var.management_vlan_tag
 }
 
-# Сервер мониторинга
-module "monitoring_server" {
-  count = var.enable_monitoring_server ? 1 : 0
+# Уязвимый компьютер администратора
+module "admin_workstation" {
+  count = var.enable_admin_workstation ? 1 : 0
   
-  source = "../../../../terraform/modules/proxmox-vm"
+  source = "../../../../../terraform/modules/proxmox-vm"
   
-  vm_name      = "monitoring-server"
+  vm_name      = "admin-workstation"
   target_node = var.proxmox_target_node
   template_name = var.proxmox_template_name
   
-  cpu    = var.monitoring_cpu
-  memory = var.monitoring_memory
-  disk_size = var.monitoring_disk_size
+  cpu    = var.admin_workstation_cpu
+  memory = var.admin_workstation_memory
+  disk_size = var.admin_workstation_disk_size
   disk_storage = var.proxmox_disk_storage
   
   network_bridge = var.network_bridge
-  ip_address     = "${var.monitoring_ip}/24"
+  ip_address     = "${var.admin_workstation_ip}/24"  # Теперь 192.168.30.20
   gateway        = var.network_gateway
   dns_servers    = var.dns_servers
   
-  hostname = "monitoring-server"
+  hostname = "admin-workstation"
   domain   = var.domain
   
   ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : (var.ssh_public_key != "" ? var.ssh_public_key : "")
   ssh_user       = var.ssh_user
   
-  vlan_tag = var.monitoring_vlan_tag
-}
-
-# Jump-сервер
-module "jump_server" {
-  count = var.enable_jump_server ? 1 : 0
-  
-  source = "../../../../terraform/modules/proxmox-vm"
-  
-  vm_name      = "jump-server"
-  target_node = var.proxmox_target_node
-  template_name = var.proxmox_template_name
-  
-  cpu    = var.jump_cpu
-  memory = var.jump_memory
-  disk_size = var.jump_disk_size
-  disk_storage = var.proxmox_disk_storage
-  
-  network_bridge = var.network_bridge
-  ip_address     = "${var.jump_ip}/24"
-  gateway        = var.network_gateway
-  dns_servers    = var.dns_servers
-  
-  hostname = "jump-server"
-  domain   = var.domain
-  
-  ssh_public_key = var.ssh_public_key_file != "" ? file(var.ssh_public_key_file) : (var.ssh_public_key != "" ? var.ssh_public_key : "")
-  ssh_user       = var.ssh_user
-  
-  vlan_tag = var.jump_vlan_tag
+  vlan_tag = var.admin_workstation_vlan_tag
 }
 
 # Машина атакующего (Kali Linux)
 module "kali_attacker" {
   count = var.enable_kali_attacker ? 1 : 0
   
-  source = "../../../../terraform/modules/proxmox-vm"
+  source = "../../../../../terraform/modules/proxmox-vm"
   
   vm_name      = "kali-attacker"
   target_node = var.proxmox_target_node
@@ -211,10 +182,9 @@ output "vm_ips" {
   description = "IP адреса всех виртуальных машин"
   value = {
     radius_server    = var.enable_radius_server ? module.radius_server[0].vm_ips[0] : null
-    billing_server   = var.enable_billing_server ? module.billing_server[0].vm_ips[0] : null
-    web_server       = var.enable_web_server ? module.web_server[0].vm_ips[0] : null
-    monitoring_server = var.enable_monitoring_server ? module.monitoring_server[0].vm_ips[0] : null
-    jump_server       = var.enable_jump_server ? module.jump_server[0].vm_ips[0] : null
+    services_server  = var.enable_services_server ? module.services_server[0].vm_ips[0] : null
+    management_server = var.enable_management_server ? module.management_server[0].vm_ips[0] : null
+    admin_workstation = var.enable_admin_workstation ? module.admin_workstation[0].vm_ips[0] : null
     kali_attacker     = var.enable_kali_attacker ? module.kali_attacker[0].vm_ips[0] : null
   }
 }
@@ -223,10 +193,9 @@ output "vm_names" {
   description = "Имена всех виртуальных машин"
   value = {
     radius_server    = var.enable_radius_server ? module.radius_server[0].vm_names[0] : null
-    billing_server   = var.enable_billing_server ? module.billing_server[0].vm_names[0] : null
-    web_server       = var.enable_web_server ? module.web_server[0].vm_names[0] : null
-    monitoring_server = var.enable_monitoring_server ? module.monitoring_server[0].vm_names[0] : null
-    jump_server       = var.enable_jump_server ? module.jump_server[0].vm_names[0] : null
+    services_server  = var.enable_services_server ? module.services_server[0].vm_names[0] : null
+    management_server = var.enable_management_server ? module.management_server[0].vm_names[0] : null
+    admin_workstation = var.enable_admin_workstation ? module.admin_workstation[0].vm_names[0] : null
     kali_attacker     = var.enable_kali_attacker ? module.kali_attacker[0].vm_names[0] : null
   }
 }

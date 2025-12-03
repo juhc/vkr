@@ -38,6 +38,7 @@ billing_ip   = "192.168.20.10"
 web_ip       = "192.168.20.20"
 monitoring_ip = "192.168.30.10"
 jump_ip      = "192.168.30.20"
+admin_workstation_ip = "192.168.30.30"
 kali_ip      = "192.168.50.10"
 
 # Ресурсы для RADIUS сервера
@@ -65,6 +66,11 @@ jump_cpu     = 2
 jump_memory  = 2048
 jump_disk_size = "30G"
 
+# Ресурсы для компьютера администратора
+admin_workstation_cpu     = 2
+admin_workstation_memory  = 4096
+admin_workstation_disk_size = "50G"
+
 # Ресурсы для Kali Linux
 kali_cpu     = 4
 kali_memory  = 8192
@@ -77,6 +83,7 @@ enable_billing_server   = true
 enable_web_server       = true
 enable_monitoring_server = true
 enable_jump_server      = true
+enable_admin_workstation = true
 enable_kali_attacker     = true
 
 # Для запуска только одной машины, установите все в false, кроме нужной:
@@ -85,6 +92,7 @@ enable_kali_attacker     = true
 # enable_web_server       = false
 # enable_monitoring_server = false
 # enable_jump_server      = false
+# enable_admin_workstation = false
 # enable_kali_attacker     = false
 
 # VLAN теги (опционально, оставьте null если не используете)

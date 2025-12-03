@@ -6,7 +6,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "telmate/proxmox"
-      version = "~> 2.9"
+      version = "3.0.2-rc05"
     }
   }
 }
@@ -137,19 +137,27 @@ resource "proxmox_vm_qemu" "vm" {
   clone       = var.template_name
   
   # Ресурсы
-  cores   = var.cpu
+  cpu {
+    cores  = var.cpu
+    sockets = 1
+    type   = "kvm64"  # Используем kvm64 для лучшей совместимости
+  }
   memory  = var.memory
-  sockets = 1
+  kvm     = false  # Отключаем KVM, используем эмуляцию
   
-  # Диск
+  # Диск с virtio-scsi контроллером
+  scsihw = "virtio-scsi-single"  # Используем virtio-scsi вместо обычного SCSI
+  
   disk {
+    slot    = "scsi0"
     storage = var.disk_storage
     size    = var.disk_size
-    type    = "scsi"
+    type    = "disk"
   }
   
   # Сеть
   network {
+    id     = 0
     bridge = var.network_bridge
     model  = "virtio"
     tag    = var.vlan_tag
@@ -171,6 +179,16 @@ resource "proxmox_vm_qemu" "vm" {
   # Дополнительные настройки
   onboot = var.onboot
   agent  = var.agent ? 1 : 0
+  
+  # VGA/VNC настройки для консоли
+  vga {
+    type = "std"  # Стандартный VGA, поддерживает VNC
+    memory = 16   # Память для VGA (MB)
+  }
+  
+  # Исправление Kernel panic: IO-APIC + timer doesn't work
+  # Используем BIOS вместо UEFI и отключаем некоторые функции
+  bios = "seabios"
   
   # Cloud-init опции
   cicustom = ""

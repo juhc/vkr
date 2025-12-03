@@ -22,6 +22,7 @@
 
 ### ✅ [Оценка](assessment/)
 
+- **[Как проверить результаты](assessment/HOW_TO_EVALUATE.md)** - руководство для преподавателей по проверке результатов обучения
 - **[CHECKLISTS.md](assessment/CHECKLISTS.md)** - чек-листы для проверки работ студентов
 - **[REPORT_TEMPLATE.md](assessment/REPORT_TEMPLATE.md)** - шаблон для составления отчета
 - **[SOLUTIONS.md](assessment/SOLUTIONS.md)** - решения для преподавателей (⚠️ только для преподавателей)
@@ -42,8 +43,9 @@
 ### Для преподавателей
 
 1. **Ознакомьтесь со сценарием**: [overview/README.md](overview/README.md)
-2. **Изучите чек-листы**: [assessment/CHECKLISTS.md](assessment/CHECKLISTS.md)
-3. **Используйте решения**: [assessment/SOLUTIONS.md](assessment/SOLUTIONS.md) (⚠️ секретно!)
+2. **Изучите методы проверки**: [assessment/HOW_TO_EVALUATE.md](assessment/HOW_TO_EVALUATE.md)
+3. **Используйте чек-листы**: [assessment/CHECKLISTS.md](assessment/CHECKLISTS.md)
+4. **Проверяйте решения**: [assessment/SOLUTIONS.md](assessment/SOLUTIONS.md) (⚠️ секретно!)
 
 ### Для администраторов
 

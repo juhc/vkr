@@ -13,32 +13,26 @@ variable "enable_radius_server" {
   default     = true
 }
 
-variable "enable_billing_server" {
-  description = "Создать биллинговый сервер"
+variable "enable_services_server" {
+  description = "Создать сервер сервисов (объединенный биллинг + веб)"
   type        = bool
   default     = true
 }
 
-variable "enable_web_server" {
-  description = "Создать веб-сервер"
-  type        = bool
-  default     = true
-}
-
-variable "enable_monitoring_server" {
-  description = "Создать сервер мониторинга"
-  type        = bool
-  default     = true
-}
-
-variable "enable_jump_server" {
-  description = "Создать jump-сервер"
+variable "enable_management_server" {
+  description = "Создать сервер управления (объединенный мониторинг + jump)"
   type        = bool
   default     = true
 }
 
 variable "enable_kali_attacker" {
   description = "Создать машину атакующего (Kali Linux)"
+  type        = bool
+  default     = true
+}
+
+variable "enable_admin_workstation" {
+  description = "Создать уязвимый компьютер администратора"
   type        = bool
   default     = true
 }
@@ -135,28 +129,16 @@ variable "radius_ip" {
   default     = "192.168.10.10"
 }
 
-variable "billing_ip" {
-  description = "IP адрес биллингового сервера"
+variable "services_ip" {
+  description = "IP адрес сервера сервисов (объединенный биллинг + веб)"
   type        = string
   default     = "192.168.20.10"
 }
 
-variable "web_ip" {
-  description = "IP адрес веб-сервера"
-  type        = string
-  default     = "192.168.20.20"
-}
-
-variable "monitoring_ip" {
-  description = "IP адрес сервера мониторинга"
+variable "management_ip" {
+  description = "IP адрес сервера управления (объединенный мониторинг + jump)"
   type        = string
   default     = "192.168.30.10"
-}
-
-variable "jump_ip" {
-  description = "IP адрес jump-сервера"
-  type        = string
-  default     = "192.168.30.20"
 }
 
 variable "kali_ip" {
@@ -190,102 +172,84 @@ variable "radius_vlan_tag" {
   default     = null
 }
 
-# Ресурсы для биллингового сервера
-variable "billing_cpu" {
-  description = "Количество CPU для биллингового сервера"
+# Ресурсы для сервера сервисов (объединенный биллинг + веб)
+variable "services_cpu" {
+  description = "Количество CPU для сервера сервисов"
   type        = number
   default     = 4
 }
 
-variable "billing_memory" {
-  description = "Память для биллингового сервера (MB)"
+variable "services_memory" {
+  description = "Память для сервера сервисов (MB)"
   type        = number
   default     = 8192
 }
 
-variable "billing_disk_size" {
-  description = "Размер диска для биллингового сервера"
+variable "services_disk_size" {
+  description = "Размер диска для сервера сервисов"
   type        = string
-  default     = "100G"
+  default     = "150G"
 }
 
-variable "billing_vlan_tag" {
-  description = "VLAN тег для биллингового сервера"
+variable "services_vlan_tag" {
+  description = "VLAN тег для сервера сервисов"
   type        = number
   default     = null
 }
 
-# Ресурсы для веб-сервера
-variable "web_cpu" {
-  description = "Количество CPU для веб-сервера"
+# Ресурсы для сервера управления (объединенный мониторинг + jump)
+variable "management_cpu" {
+  description = "Количество CPU для сервера управления"
+  type        = number
+  default     = 4
+}
+
+variable "management_memory" {
+  description = "Память для сервера управления (MB)"
+  type        = number
+  default     = 6144
+}
+
+variable "management_disk_size" {
+  description = "Размер диска для сервера управления"
+  type        = string
+  default     = "130G"
+}
+
+variable "management_vlan_tag" {
+  description = "VLAN тег для сервера управления"
+  type        = number
+  default     = null
+}
+
+# IP адрес компьютера администратора (перемещен на освободившийся IP)
+variable "admin_workstation_ip" {
+  description = "IP адрес компьютера администратора"
+  type        = string
+  default     = "192.168.30.20"
+}
+
+# Ресурсы для компьютера администратора
+variable "admin_workstation_cpu" {
+  description = "Количество CPU для компьютера администратора"
   type        = number
   default     = 2
 }
 
-variable "web_memory" {
-  description = "Память для веб-сервера (MB)"
+variable "admin_workstation_memory" {
+  description = "Память для компьютера администратора (MB)"
   type        = number
   default     = 4096
 }
 
-variable "web_disk_size" {
-  description = "Размер диска для веб-сервера"
+variable "admin_workstation_disk_size" {
+  description = "Размер диска для компьютера администратора"
   type        = string
   default     = "50G"
 }
 
-variable "web_vlan_tag" {
-  description = "VLAN тег для веб-сервера"
-  type        = number
-  default     = null
-}
-
-# Ресурсы для сервера мониторинга
-variable "monitoring_cpu" {
-  description = "Количество CPU для сервера мониторинга"
-  type        = number
-  default     = 2
-}
-
-variable "monitoring_memory" {
-  description = "Память для сервера мониторинга (MB)"
-  type        = number
-  default     = 4096
-}
-
-variable "monitoring_disk_size" {
-  description = "Размер диска для сервера мониторинга"
-  type        = string
-  default     = "100G"
-}
-
-variable "monitoring_vlan_tag" {
-  description = "VLAN тег для сервера мониторинга"
-  type        = number
-  default     = null
-}
-
-# Ресурсы для jump-сервера
-variable "jump_cpu" {
-  description = "Количество CPU для jump-сервера"
-  type        = number
-  default     = 2
-}
-
-variable "jump_memory" {
-  description = "Память для jump-сервера (MB)"
-  type        = number
-  default     = 2048
-}
-
-variable "jump_disk_size" {
-  description = "Размер диска для jump-сервера"
-  type        = string
-  default     = "30G"
-}
-
-variable "jump_vlan_tag" {
-  description = "VLAN тег для jump-сервера"
+variable "admin_workstation_vlan_tag" {
+  description = "VLAN тег для компьютера администратора"
   type        = number
   default     = null
 }
