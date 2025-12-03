@@ -1,0 +1,354 @@
+# Руководство по развертыванию инфраструктуры [Название сценария]
+
+## Выбор платформы виртуализации
+
+Инфраструктура может быть развернута на двух платформах:
+
+1. **Proxmox VE** (рекомендуется для удаленного развертывания) - см. [terraform/proxmox/README.md](infrastructure/terraform/proxmox/README.md)
+2. **libvirt/KVM** (для локального развертывания) - см. раздел ниже
+
+Для развертывания на **Proxmox** перейдите в директорию:
+```bash
+cd infrastructure/terraform/proxmox
+```
+
+Следуйте инструкциям в [README.md](infrastructure/terraform/proxmox/README.md) и [PROXMOX_SETUP.md](infrastructure/terraform/proxmox/PROXMOX_SETUP.md).
+
+---
+
+## Развертывание на libvirt/KVM (локальное)
+
+## Требования к системе
+
+### Минимальные требования
+- **CPU**: [N] ядер (рекомендуется [N]+)
+- **RAM**: [N] GB (рекомендуется [N] GB+)
+- **Диск**: [N] GB свободного места (SSD рекомендуется)
+- **ОС**: Ubuntu 20.04 LTS или новее, CentOS 8+, или другая Linux система с поддержкой libvirt
+
+### Необходимое программное обеспечение
+- **Terraform**: версия 1.0+
+- **Ansible**: версия 4.0+
+- **libvirt**: последняя версия
+- **Python**: версия 3.8+
+- **QEMU/KVM**: для виртуализации
+
+## Установка зависимостей
+
+### Ubuntu/Debian
+
+```bash
+# Обновление системы
+sudo apt update && sudo apt upgrade -y
+
+# Установка libvirt и QEMU
+sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager
+
+# Добавление пользователя в группу libvirt
+sudo usermod -aG libvirt $USER
+sudo usermod -aG kvm $USER
+
+# Установка Terraform
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+sudo apt update && sudo apt install terraform
+
+# Установка Ansible
+sudo apt install -y ansible python3-pip
+
+# Установка Python библиотек
+pip3 install pyyaml jinja2
+```
+
+### CentOS/RHEL
+
+```bash
+# Установка libvirt и QEMU
+sudo yum install -y qemu-kvm libvirt libvirt-python libguestfs-tools virt-install
+
+# Запуск libvirt
+sudo systemctl enable --now libvirtd
+
+# Добавление пользователя в группу libvirt
+sudo usermod -aG libvirt $USER
+
+# Установка Terraform
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+sudo yum install -y terraform
+
+# Установка Ansible
+sudo yum install -y ansible python3-pip
+
+# Установка Python библиотек
+pip3 install pyyaml jinja2
+```
+
+## Подготовка базового образа
+
+### Скачивание Ubuntu Cloud Image
+
+```bash
+# Создание директории для образов
+sudo mkdir -p /var/lib/libvirt/images
+cd /var/lib/libvirt/images
+
+# Скачивание Ubuntu 20.04 Cloud Image
+sudo wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+
+# Установка прав доступа
+sudo chmod 644 focal-server-cloudimg-amd64.img
+```
+
+### Создание SSH ключа (если отсутствует)
+
+```bash
+# Генерация SSH ключа
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
+
+# Копирование публичного ключа
+cat ~/.ssh/id_rsa.pub
+```
+
+## Настройка проекта
+
+### 1. Клонирование репозитория
+
+```bash
+git clone <repository-url>
+cd vkr/scenarios/scenario-[name]
+```
+
+### 2. Настройка переменных Terraform
+
+```bash
+cd infrastructure/terraform
+cp terraform.tfvars.example terraform.tfvars
+
+# Редактирование terraform.tfvars
+nano terraform.tfvars
+```
+
+Пример содержимого `terraform.tfvars`:
+```hcl
+base_image_path = "/var/lib/libvirt/images/ubuntu-20.04-server-cloudimg-amd64.img"
+ssh_public_key_path = "~/.ssh/id_rsa.pub"
+disk_pool = "default"
+```
+
+### 3. Настройка Ansible инвентаря
+
+Если инвентарь не генерируется автоматически, создайте файл `infrastructure/ansible/inventory.yml` на основе шаблона.
+
+## Развертывание инфраструктуры
+
+### Автоматическое развертывание (рекомендуется)
+
+```bash
+# Использование скрипта автоматического развертывания
+./scripts/deploy.sh
+```
+
+Скрипт выполнит следующие шаги:
+1. Проверку наличия необходимых инструментов
+2. Проверку базового образа
+3. Инициализацию Terraform
+4. Развертывание виртуальных машин
+5. Генерацию Ansible инвентаря
+6. Ожидание готовности серверов
+7. Применение конфигураций через Ansible
+
+### Ручное развертывание
+
+#### Шаг 1: Развертывание через Terraform
+
+```bash
+cd infrastructure/terraform
+
+# Инициализация Terraform
+terraform init
+
+# Просмотр плана развертывания
+terraform plan -var-file="terraform.tfvars"
+
+# Развертывание инфраструктуры
+terraform apply -var-file="terraform.tfvars"
+```
+
+#### Шаг 2: Ожидание готовности серверов
+
+Дождитесь полной загрузки всех виртуальных машин (обычно 3-7 минут).
+
+#### Шаг 3: Генерация Ansible инвентаря
+
+```bash
+# Экспорт IP адресов из Terraform outputs
+terraform output -json > /tmp/terraform_outputs.json
+
+# Использование скрипта генерации инвентаря (если доступен)
+# или ручное создание на основе outputs
+```
+
+#### Шаг 4: Применение конфигураций через Ansible
+
+```bash
+cd ../ansible
+
+# Проверка доступности серверов
+ansible all -i inventory.yml -m ping
+
+# Применение конфигураций
+ansible-playbook -i inventory.yml playbook.yml
+```
+
+## Проверка развертывания
+
+### Проверка виртуальных машин
+
+```bash
+# Список всех виртуальных машин
+virsh list --all
+
+# Проверка состояния сети
+virsh net-list --all
+
+# Проверка подключения к серверам
+ssh ubuntu@[IP]  # [Описание сервера]
+```
+
+### Проверка сервисов
+
+```bash
+# Проверка [Сервис 1]
+[команда проверки]
+
+# Проверка [Сервис 2]
+[команда проверки]
+```
+
+## Удаление инфраструктуры
+
+### Автоматическое удаление
+
+```bash
+./scripts/destroy.sh
+```
+
+### Ручное удаление
+
+```bash
+cd infrastructure/terraform
+terraform destroy -var-file="terraform.tfvars"
+```
+
+## Устранение проблем
+
+### Проблема: Виртуальные машины не запускаются
+
+**Решение**:
+```bash
+# Проверка статуса libvirt
+sudo systemctl status libvirtd
+
+# Перезапуск libvirt
+sudo systemctl restart libvirtd
+
+# Проверка логов
+sudo journalctl -u libvirtd -f
+```
+
+### Проблема: Terraform не может подключиться к libvirt
+
+**Решение**:
+```bash
+# Проверка подключения к libvirt
+virsh list
+
+# Если ошибка доступа, добавьте пользователя в группу
+sudo usermod -aG libvirt $USER
+newgrp libvirt
+```
+
+### Проблема: Ansible не может подключиться к серверам
+
+**Решение**:
+```bash
+# Проверка SSH подключения
+ssh ubuntu@<server-ip>
+
+# Проверка инвентаря Ansible
+ansible all -i inventory.yml -m ping -vvv
+
+# Проверка SSH ключей
+ssh-add ~/.ssh/id_rsa
+```
+
+### Проблема: Недостаточно места на диске
+
+**Решение**:
+```bash
+# Проверка свободного места
+df -h
+
+# Очистка неиспользуемых образов
+sudo virsh vol-list --pool default
+sudo virsh vol-delete <volume-name> --pool default
+```
+
+## Оптимизация производительности
+
+### Настройка CPU и памяти
+
+Для улучшения производительности можно увеличить ресурсы виртуальных машин в файле `infrastructure/terraform/main.tf`:
+
+```hcl
+cpu    = 4  # Увеличить количество CPU
+memory = 8192  # Увеличить объем памяти (MB)
+```
+
+### Использование SSD
+
+Для лучшей производительности используйте SSD для хранения образов и дисков виртуальных машин.
+
+### Настройка сети
+
+Для улучшения сетевой производительности:
+- Используйте виртуальные сети с bridge интерфейсами
+- Настройте QoS для критичных сервисов
+- Мониторьте использование пропускной способности
+
+## Безопасность
+
+⚠️ **ВАЖНО**: Эта инфраструктура создана для обучения и содержит намеренные уязвимости!
+
+- Используйте только в изолированной среде
+- Не подключайте к производственным сетям
+- Не используйте реальные учетные данные
+- Удаляйте инфраструктуру после завершения обучения
+- Не используйте реальные данные клиентов
+
+## Дополнительные ресурсы
+
+- [Документация Terraform](https://www.terraform.io/docs)
+- [Документация Ansible](https://docs.ansible.com)
+- [Документация libvirt](https://libvirt.org/docs.html)
+- [Ubuntu Cloud Images](https://cloud-images.ubuntu.com/)
+
+## Поддержка
+
+При возникновении проблем:
+1. Проверьте логи: `terraform apply` и `ansible-playbook`
+2. Проверьте документацию по устранению проблем выше
+3. Создайте issue в репозитории проекта
+
+---
+
+## Навигация
+
+- **[← Назад к главной](../../README.md)** - главная страница с навигацией
+- **[Быстрый старт](QUICKSTART.md)** - краткое руководство по развертыванию
+- **[Тестовое развертывание](QUICK_TEST_DEPLOY.md)** - развертывание одной машины
+- **[Обзор сценария](../overview/README.md)** - описание организации и сети
+- **[Сетевая топология](../overview/network-topology.md)** - детальное описание сети
+- **[Сценарии машин](../overview/machine-scenarios.md)** - описание каждой машины
+
