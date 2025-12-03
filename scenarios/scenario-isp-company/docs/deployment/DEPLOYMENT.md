@@ -4,7 +4,7 @@
 
 Инфраструктура может быть развернута на двух платформах:
 
-1. **Proxmox VE** (рекомендуется для удаленного развертывания) - см. [terraform/proxmox/README.md](infrastructure/terraform/proxmox/README.md)
+1. **Proxmox VE** (рекомендуется для удаленного развертывания) - см. раздел ниже
 2. **libvirt/KVM** (для локального развертывания) - см. раздел ниже
 
 Для развертывания на **Proxmox** перейдите в директорию:
@@ -12,7 +12,105 @@
 cd infrastructure/terraform/proxmox
 ```
 
-Следуйте инструкциям в [README.md](infrastructure/terraform/proxmox/README.md) и [PROXMOX_SETUP.md](infrastructure/terraform/proxmox/PROXMOX_SETUP.md).
+Следуйте инструкциям в разделе "Развертывание на Proxmox VE" ниже.
+
+---
+
+## Развертывание на Proxmox VE
+
+### Требования к системе
+
+- **Proxmox VE**: версия 7.0 или новее
+- **Terraform**: версия 1.0+
+- **Ansible**: версия 4.0+
+- **SSH доступ**: к Proxmox серверу
+
+### Подготовка Proxmox
+
+#### 1. Создание API токена
+
+1. Войдите в веб-интерфейс Proxmox
+2. Перейдите в **Datacenter → Permissions → API Tokens → Add**
+3. Создайте токен:
+   - **Token ID**: `terraform@pve!terraform-token`
+   - **User**: `terraform@pve` (или создайте нового пользователя)
+   - Сохраните **Token Secret**!
+
+#### 2. Создание шаблона Ubuntu
+
+1. Загрузите Ubuntu 20.04 Cloud Image
+2. Создайте VM из образа
+3. Настройте cloud-init
+4. Преобразуйте в шаблон (правой кнопкой → Convert to Template)
+5. Назовите шаблон: `ubuntu-20.04-template`
+
+### Настройка Terraform
+
+```bash
+cd infrastructure/terraform/proxmox
+
+# Скопируйте пример конфигурации
+cp terraform.tfvars.example terraform.tfvars
+
+# Отредактируйте terraform.tfvars
+nano terraform.tfvars
+```
+
+Пример `terraform.tfvars`:
+```hcl
+# Настройки Proxmox API
+proxmox_api_url          = "https://ВАШ_IP_PROXMOX:8006/api2/json"
+proxmox_api_token_id     = "terraform@pve!terraform-token"
+proxmox_api_token_secret = "ВАШ_СЕКРЕТ_ТОКЕНА"
+proxmox_tls_insecure     = true
+
+# Узел Proxmox
+proxmox_target_node = "proxmox"  # Или имя вашего узла
+
+# Шаблон
+proxmox_template_name = "ubuntu-20.04-template"
+
+# Хранилище
+proxmox_disk_storage = "local-lvm"
+
+# Сеть
+network_bridge  = "vmbr0"
+network_gateway = "192.168.10.1"
+dns_servers     = ["8.8.8.8", "8.8.4.4"]
+
+# SSH
+ssh_public_key_file = "~/.ssh/id_rsa.pub"
+ssh_user            = "ubuntu"
+```
+
+### Развертывание
+
+```bash
+# Инициализация Terraform
+terraform init
+
+# Просмотр плана
+terraform plan
+
+# Развертывание
+terraform apply
+```
+
+### Проверка развертывания
+
+```bash
+# Просмотр созданных машин
+terraform output vm_ips
+
+# Подключение к машинам
+ssh ubuntu@<IP_ADDRESS>
+```
+
+### Удаление инфраструктуры
+
+```bash
+terraform destroy
+```
 
 ---
 
