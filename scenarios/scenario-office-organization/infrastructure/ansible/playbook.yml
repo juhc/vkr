@@ -69,7 +69,7 @@
       when: ansible_os_family == "Debian"
       ignore_errors: yes
 
-- name: Настройка веб-сервера с Log4Shell
+- name: Настройка веб-сервера с уязвимостями ОС
   hosts: web-server
   become: yes
   
@@ -90,7 +90,7 @@
   roles:
     - role: database-mysql
 
-- name: Настройка DNS сервера с открытым рекурсивным DNS
+- name: Настройка DNS сервера с уязвимостями ОС
   hosts: dns-server
   become: yes
   
@@ -105,15 +105,31 @@
         update_cache: yes
       become: yes
     
-    - name: Настройка небезопасной конфигурации BIND9
+    - name: Отключение автоматических обновлений безопасности
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: "^Unattended-Upgrade::Automatic-Reboot"
+        line: "Unattended-Upgrade::Automatic-Reboot \"false\";"
+        insertafter: "^//Unattended-Upgrade::Automatic-Reboot"
+      become: yes
+      ignore_errors: yes
+    
+    - name: Отключение автоматических обновлений
+      file:
+        path: /etc/apt/apt.conf.d/20auto-upgrades
+        state: absent
+      become: yes
+      ignore_errors: yes
+    
+    - name: Настройка небезопасной конфигурации BIND9 (для демонстрации уязвимостей ОС)
       copy:
         content: |
           options {
               directory "/var/cache/bind";
               recursion yes;
-              allow-recursion { any; };
+              allow-recursion { 192.168.0.0/16; };
               listen-on { any; };
-              allow-query { any; };
+              allow-query { 192.168.0.0/16; };
               forwarders {
                   8.8.8.8;
                   8.8.4.4;
@@ -150,16 +166,9 @@
           @       IN  A   192.168.20.20
           
           dns-server      IN  A   192.168.10.30
-          web-server      IN  A   192.168.10.10
-          mail-server     IN  A   192.168.10.20
+          web-server     IN  A   192.168.10.10
           file-server     IN  A   192.168.20.10
-          db-server       IN  A   192.168.20.30
-          backup-server   IN  A   192.168.20.40
-          monitoring-server IN  A   192.168.20.50
-          dev-server      IN  A   192.168.30.10
-          test-server     IN  A   192.168.30.20
-          ci-cd-server    IN  A   192.168.30.30
-          jump-server     IN  A   192.168.40.10
+          db-server      IN  A   192.168.20.30
         dest: /etc/bind/db.techservice.local
         mode: '0644'
       become: yes

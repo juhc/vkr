@@ -125,23 +125,40 @@
   become: yes
   ignore_errors: yes
 
-- name: Создание информационного файла об уязвимости
+- name: Отключение автоматических обновлений безопасности
+  lineinfile:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    regexp: "^Unattended-Upgrade::Automatic-Reboot"
+    line: "Unattended-Upgrade::Automatic-Reboot \"false\";"
+    insertafter: "^//Unattended-Upgrade::Automatic-Reboot"
+  become: yes
+  ignore_errors: yes
+
+- name: Отключение автоматических обновлений
+  file:
+    path: /etc/apt/apt.conf.d/20auto-upgrades
+    state: absent
+  become: yes
+  ignore_errors: yes
+
+- name: Создание информационного файла об уязвимостях ОС
   copy:
     content: |
-      # Уязвимости MySQL сервера
+      # Уязвимости операционной системы
       
-      1. Слабый пароль root: root123
-      2. Удаленный доступ root разрешен
-      3. Отсутствие шифрования соединений
-      4. Чувствительные данные в открытом виде
+      Этот сервер настроен с уязвимостями ОС для обучения:
+      
+      1. Слабый пароль root MySQL: root123 (ошибка администратора)
+      2. Удаленный доступ root разрешен (небезопасная конфигурация ОС)
+      3. Отсутствие шифрования соединений (не настроено в ОС)
+      4. Отключены автоматические обновления безопасности ОС
+      5. Чувствительные данные в открытом виде (неправильные права доступа)
       
       Для тестирования:
       mysql -h 192.168.20.30 -u root -proot123
       
-      Использование:
-      USE sensitive_data;
-      SELECT * FROM users;
-      SELECT * FROM financial_data;
+      Проверка обновлений ОС:
+      apt list --upgradable
     dest: /root/VULNERABILITY_INFO.txt
     mode: '0644'
   become: yes

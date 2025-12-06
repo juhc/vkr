@@ -1,0 +1,65 @@
+---
+# ПРИМЕР: Конфигурация уязвимостей для учебной инфраструктуры
+# Скопируйте этот файл в vulnerabilities.yml и настройте по необходимости
+#
+# Использование:
+# 1. cp vulnerabilities.example.yml vulnerabilities.yml
+# 2. Отредактируйте vulnerabilities.yml, установив false для ненужных уязвимостей
+# 3. Запустите playbook: ansible-playbook -i inventory.yml playbook.yml
+
+# ============================================
+# ПРИМЕР: Настройка для начинающих
+# ============================================
+# Включить только базовые уязвимости для обучения
+
+ubuntu_vulnerabilities:
+  auth_weak_passwords: true              # ✅ Включить
+  auth_no_pam_restrictions: true         # ✅ Включить
+  ssh_password_auth: true                # ✅ Включить
+  ssh_root_login: true                   # ✅ Включить
+  network_firewall_off: true             # ✅ Включить
+  updates_disabled: true                # ✅ Включить
+  files_wrong_permissions: true         # ✅ Включить
+  # Остальные отключить для упрощения
+  auth_no_account_lockout: false         # ❌ Отключить
+  ssh_weak_algorithms: false             # ❌ Отключить
+  files_shadow_vulnerabilities: false    # ❌ Отключить (сложные)
+  docker_no_protection: false            # ❌ Отключить
+  # ... и т.д.
+
+# ============================================
+# ПРИМЕР: Настройка для продвинутых
+# ============================================
+# Включить все уязвимости для комплексного обучения
+
+ubuntu_vulnerabilities:
+  # Все установить в true
+  auth_weak_passwords: true
+  auth_no_pam_restrictions: true
+  # ... все остальные true
+
+# ============================================
+# ПРИМЕР: Выборочное включение категорий
+# ============================================
+# Включить только уязвимости аутентификации и SSH
+
+ubuntu_vulnerabilities:
+  # Категория 1: Аутентификация
+  auth_weak_passwords: true
+  auth_no_pam_restrictions: true
+  auth_no_account_lockout: true
+  auth_no_password_expiry: true
+  auth_wide_sudo_rights: true
+  auth_no_mfa: true
+  
+  # Категория 2: SSH
+  ssh_password_auth: true
+  ssh_root_login: true
+  ssh_weak_algorithms: true
+  ssh_no_fail2ban: true
+  
+  # Остальные категории отключить
+  network_firewall_off: false
+  updates_disabled: false
+  # ... и т.д.
+

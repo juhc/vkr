@@ -1,0 +1,146 @@
+---
+# Конфигурация уязвимостей для учебной инфраструктуры
+# Установите значение false для отключения конкретной категории уязвимостей
+
+# ============================================
+# UBUNTU SERVER - УЯЗВИМОСТИ LINUX
+# ============================================
+
+ubuntu_vulnerabilities:
+  # 1. ОШИБКИ В УПРАВЛЕНИИ АККАУНТАМИ И АУТЕНТИФИКАЦИЕЙ
+  auth_weak_passwords: true              # Слабые пароли пользователей
+  auth_no_pam_restrictions: true         # Нет PAM-ограничений
+  auth_no_account_lockout: true          # Нет блокировки после неверных попыток
+  auth_no_password_expiry: true          # Пароли никогда не истекают
+  auth_wide_sudo_rights: true           # Широкие sudo права
+  auth_no_mfa: true                      # Нет MFA
+  
+  # 2. УЯЗВИМОСТИ ПРИ КОНФИГУРАЦИИ SSH
+  ssh_password_auth: true                # Парольная аутентификация SSH
+  ssh_root_login: true                   # Разрешен root login
+  ssh_weak_algorithms: true              # Слабые алгоритмы шифрования
+  ssh_no_fail2ban: true                  # Нет fail2ban и firewall
+  
+  # 3. ОШИБКИ КОНФИГУРАЦИИ СЕТИ И FIREWALL
+  network_firewall_off: true             # Firewall отключен
+  network_open_ports: true               # Открытые небезопасные порты
+  network_no_segmentation: true          # Нет сетевой сегментации
+  
+  # 4. ОШИБКИ ПРИ НАСТРОЙКЕ ОБНОВЛЕНИЙ И ПАКЕТОВ
+  updates_disabled: true                 # Автоматические обновления отключены
+  updates_untrusted_repos: true         # Небезопасные репозитории
+  updates_no_integrity_check: true       # Нет проверки подписей пакетов
+  
+  # 5. ОШИБКИ В УПРАВЛЕНИИ СЛУЖБАМИ И ДЕМОНАМИ
+  services_unnecessary_enabled: true     # Лишние службы включены
+  services_root_privileges: true         # Службы работают от root
+  
+  # 6. ОШИБКИ С ПРАВАМИ ДОСТУПА И ФАЙЛАМИ
+  files_wrong_permissions: true          # Неправильные права на директории
+  files_wide_sudo: true                  # Широкие sudo права
+  files_unsafe_cron: true                # Небезопасные cron задачи
+  files_shadow_vulnerabilities: true     # Уязвимости /etc/shadow (10 подкатегорий)
+  
+  # 7. УЯЗВИМОСТИ ВЕБ-СЕРВИСОВ И ПРИЛОЖЕНИЙ
+  web_directory_listing: true            # Directory listing включен
+  web_server_tokens: true                # Раскрытие версии сервера
+  
+  # 8. ОШИБКИ В ЛОГИРОВАНИИ И МОНИТОРИНГЕ
+  logging_no_centralized: true          # Логи не собираются централизованно
+  logging_no_monitoring: true            # Нет мониторинга аномалий
+  
+  # 9. УЯЗВИМОСТИ КОНТЕЙНЕРИЗАЦИИ
+  docker_no_protection: true             # Docker без защиты
+  
+  # 10. ОШИБКИ РЕЗЕРВНОГО КОПИРОВАНИЯ
+  backup_unreliable: true                # Ненадежные бэкапы
+  
+  # 11. ОШИБКИ БЕЗОПАСНОСТИ ЯДРА И ОС
+  kernel_no_hardening: true              # Kernel hardening отключен
+  kernel_outdated: true                  # Устаревшее ядро
+  
+  # 12. ФИЗИЧЕСКАЯ БЕЗОПАСНОСТЬ
+  physical_no_encryption: true          # Нет шифрования дисков
+
+# ============================================
+# WINDOWS SERVER 2016 - УЯЗВИМОСТИ WINDOWS
+# ============================================
+
+windows_server_vulnerabilities:
+  # 1. УЯЗВИМОСТИ АУТЕНТИФИКАЦИИ И УПРАВЛЕНИЯ УЧЁТНЫМИ ЗАПИСЯМИ
+  auth_weak_passwords: true              # Слабые пароли
+  auth_no_password_policy: true          # Нет политики сложных паролей
+  auth_no_password_history: true         # Нет запрета на повторяющиеся пароли
+  auth_no_password_expiry: true          # Пароли никогда не истекают
+  auth_domain_admin_abuse: true          # Использование Domain Admin для обычных задач
+  auth_no_mfa: true                      # Нет MFA
+  
+  # 2. ОШИБКИ В НАСТРОЙКЕ ПОЛИТИК БЕЗОПАСНОСТИ (GPO)
+  gpo_powershell_unrestricted: true      # PowerShell Remoting без ограничений
+  gpo_audit_disabled: true               # Аудит отключен
+  gpo_passwords_in_gpp: true             # Пароли в GPP
+  gpo_no_driver_signing: true            # Нет ограничения на неподписанные драйверы
+  
+  # 3. ОШИБКИ В УПРАВЛЕНИИ ПРАВАМИ
+  rights_wide_ad_permissions: true       # Широкие права на AD-объекты
+  rights_excessive_privileged_groups: true # Чрезмерное использование привилегированных групп
+  rights_unconstrained_delegation: true  # Unconstrained Delegation
+  
+  # 4. УЯЗВИМОСТИ ИЗ-ЗА НЕПРАВИЛЬНОЙ КОНФИГУРАЦИИ СЕТИ
+  network_dns_insecure: true             # Ошибки DNS
+  network_firewall_wide_rules: true      # Широкие правила брандмауэра
+  network_smbv1_enabled: true            # SMBv1 включен
+  network_ntlmv1_allowed: true           # NTLMv1 разрешен
+  network_ldap_no_tls: true              # LDAP без TLS
+  
+  # 5. ОШИБКИ ПРИ НАСТРОЙКЕ КОНТРОЛЛЕРОВ ДОМЕНА
+  dc_used_as_regular_server: true        # DC используются как обычные сервера
+  dc_insecure_replication: true          # Небезопасная репликация
+  dc_no_physical_control: true           # Нет контроля за физическим доступом
+  
+  # 6. ОШИБКИ В РАБОТЕ С ОБНОВЛЕНИЯМИ И АНТИВИРУСОМ
+  updates_no_wsus: true                  # Нет WSUS/SCCM
+  antivirus_wrong_config: true           # Антивирус настроен неправильно
+  
+  # 7. УЯЗВИМОСТИ ЛОГИРОВАНИЯ, МОНИТОРИНГА И АУДИТА
+  logging_minimal: true                   # Минимальное логирование
+  logging_no_anomaly_monitoring: true    # Нет мониторинга аномалий
+  
+  # 8. ОШИБКИ В РЕЗЕРВНОМ КОПИРОВАНИИ
+  backup_in_domain: true                 # Бэкапы в домене и не защищены
+  backup_no_critical_objects: true       # Нет бэкапов критичных объектов
+  
+  # 9. ОШИБКИ ПРИ РАБОТЕ С СЕРВИСНЫМИ АККАУНТАМИ
+  service_accounts_domain_admin: true    # Сервисные аккаунты с Domain Admin
+  service_accounts_no_rotation: true     # Пароли не меняются годами
+  service_accounts_wrong_spn: true        # Некорректные SPN
+  
+  # 10. УСТАРЕВШИЕ И НЕБЕЗОПАСНЫЕ ТЕХНОЛОГИИ
+  legacy_ntlm_instead_kerberos: true     # NTLM вместо Kerberos
+  legacy_frs_instead_dfsr: true          # FRS вместо DFSR
+  legacy_smb_no_signing: true            # SMB без подписывания
+
+# ============================================
+# WINDOWS 10 PRO - КЛИЕНТСКИЕ УЯЗВИМОСТИ
+# ============================================
+
+windows_client_vulnerabilities:
+  auth_weak_passwords: true              # Слабые пароли
+  auth_uac_disabled: true                # UAC отключен
+  updates_disabled: true                 # Автоматические обновления отключены
+  antivirus_disabled: true               # Windows Defender отключен
+  network_smbv1_enabled: true            # SMBv1 включен
+  files_wrong_permissions: true          # Неправильные права доступа
+  network_firewall_disabled: true        # Брандмауэр отключен
+  network_rdp_enabled: true              # RDP включен
+
+# ============================================
+# ОБЩИЕ НАСТРОЙКИ
+# ============================================
+
+# Включить все уязвимости по умолчанию (для быстрого развертывания)
+enable_all_vulnerabilities: true
+
+# Уровень сложности (beginner, intermediate, advanced)
+difficulty_level: "advanced"  # beginner, intermediate, advanced
+
