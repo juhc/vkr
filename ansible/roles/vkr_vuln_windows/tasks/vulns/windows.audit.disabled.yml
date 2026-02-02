@@ -1,0 +1,5 @@
+- name: Disable auditing (auditpol) - best-effort
+  ansible.windows.win_shell: |
+    auditpol /set /category:* /success:disable /failure:disable
+  failed_when: false
+

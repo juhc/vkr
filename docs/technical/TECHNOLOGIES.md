@@ -109,7 +109,7 @@ Terraform используется для автоматического соз�
    - `terraform/modules/network/` — модуль создания сетей
 
 3. **Конфигурации сценариев**:
-   - `scenarios/scenario-office-organization/infrastructure/terraform/` — конфигурация для конкретного сценария
+   - `stands/scenario-windows-stand/infrastructure/terraform/` — конфигурация для конкретного стенда
 
 #### Пример использования модуля VM:
 
@@ -181,9 +181,9 @@ Ansible применяется для настройки операционны�
    - Специфичные плейбуки для каждого типа сервера
 
 2. **Роли** (`roles/`):
-   - `web-server-apache/` — настройка веб-сервера с уязвимостью Log4Shell
-   - `database-mysql/` — настройка MySQL с слабыми паролями
-   - `file-server-samba/` — настройка файлового сервера
+   - `vkr_accounts/` — управление пользователями/группами на Linux/Windows
+   - `vkr_vuln_linux/` — включаемые уязвимости для Linux (Debian-family + RHEL-family)
+   - `vkr_vuln_windows/` — включаемые уязвимости для Windows
 
 3. **Инвентарь** (`inventory.yml`):
    - Список хостов и групп
@@ -193,35 +193,25 @@ Ansible применяется для настройки операционны�
 
 ```yaml
 ---
-- name: Настройка веб-сервера с Log4Shell
-  hosts: web-server
+- name: Применение профиля уязвимостей на Linux сервере
+  hosts: linux_server
   become: yes
-  
-  roles:
-    - role: web-server-apache
+  tasks:
+    - ansible.builtin.import_role:
+        name: vkr_vuln_linux
+      vars:
+        vuln_enabled: "{{ vuln_profiles.linux_server | default([]) }}"
 ```
 
 #### Пример роли:
 
 ```yaml
 ---
-# ansible/roles/web-server-apache/tasks/main.yml
+# ansible/roles/vkr_vuln_linux/tasks/main.yml (фрагмент)
 
-- name: Установка Apache
-  apt:
-    name: apache2
-    state: present
-  become: yes
-
-- name: Настройка небезопасной конфигурации Apache
-  lineinfile:
-    path: /etc/apache2/apache2.conf
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.line }}"
-  loop:
-    - { regexp: "^ServerTokens", line: "ServerTokens Full" }
-    - { regexp: "^ServerSignature", line: "ServerSignature On" }
-  notify: restart apache
+- name: Выбрать и применить уязвимости
+  ansible.builtin.include_tasks: "{{ item }}"
+  loop: "{{ vuln_enabled | default([]) | map('regex_replace', '^(.*)$', 'vulns/\\1.yml') | list }}"
 ```
 
 #### Ключевые возможности:

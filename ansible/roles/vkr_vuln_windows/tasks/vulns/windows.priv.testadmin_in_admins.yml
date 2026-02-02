@@ -1,0 +1,15 @@
+- name: Create extra admin user
+  ansible.windows.win_user:
+    name: "{{ vkr_vuln_windows_testadmin_user }}"
+    password: "{{ vkr_vuln_windows_weak_password }}"
+    state: present
+    groups:
+      - Users
+
+- name: Add extra user to local Administrators
+  ansible.windows.win_group_membership:
+    name: Administrators
+    members:
+      - "{{ vkr_vuln_windows_testadmin_user }}"
+    state: present
+

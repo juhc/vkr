@@ -1,0 +1,34 @@
+---
+# Наборы пользователей/групп для Windows стенда.
+#
+# Как использовать:
+# 1) Скопируйте в accounts.yml (локально/через vault) и отредактируйте
+# 2) Playbook возьмёт profiles и передаст в роль vkr_accounts
+#
+# Важно:
+# - Пользователь, под которым Ansible подключается (например ansible), уже должен существовать в шаблоне.
+# - Реальные пароли хранить через Ansible Vault.
+
+accounts_profiles:
+  windows_workstation:
+    users:
+      - name: ansible
+        admin: true
+        # password: "StrongTempPass123!"
+        ssh_public_keys:
+          - "ssh-ed25519 AAAA... admin@laptop"
+
+  windows_server:
+    users:
+      - name: ansible
+        admin: true
+        ssh_public_keys:
+          - "ssh-ed25519 AAAA... admin@laptop"
+
+  domain_controller:
+    users:
+      - name: ansible
+        admin: true
+        ssh_public_keys:
+          - "ssh-ed25519 AAAA... admin@laptop"
+

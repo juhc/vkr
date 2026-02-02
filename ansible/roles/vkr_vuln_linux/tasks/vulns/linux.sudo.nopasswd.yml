@@ -1,0 +1,8 @@
+- name: Allow passwordless sudo (NOPASSWD) for all sudo users
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/99-vkr-nopasswd
+    mode: "0440"
+    content: |
+      %sudo ALL=(ALL) NOPASSWD:ALL
+      {{ vkr_vuln_linux_extra_admin_user }} ALL=(ALL) NOPASSWD:ALL
+

@@ -35,10 +35,10 @@ git checkout main
 git checkout scenario-isp-company
 
 # 2. Внесите изменения
-nano scenarios/scenario-isp-company/README.md
+nano stands/scenario-windows-stand/README.md
 
 # 3. Закоммитьте изменения
-git add scenarios/scenario-isp-company/README.md
+git add stands/scenario-windows-stand/README.md
 git commit -m "Описание изменений"
 
 # 4. Опубликуйте изменения
@@ -65,7 +65,7 @@ git push origin scenario-isp-company
 ### `scenario-isp-company`
 
 **Содержимое:**
-- Сценарий инфраструктуры ISP-компании (`scenarios/scenario-isp-company/`)
+- Windows стенд (`stands/scenario-windows-stand/`)
 - Все общие компоненты (Terraform модули, Ansible роли, документация)
 
 **Описание сценария:**
@@ -76,14 +76,14 @@ git push origin scenario-isp-company
 **Использование:**
 ```bash
 git checkout scenario-isp-company
-cd scenarios/scenario-isp-company
+cd stands/scenario-windows-stand
 # Следуйте инструкциям в README.md
 ```
 
 ### `scenario-office-organization`
 
 **Содержимое:**
-- Сценарий инфраструктуры офисной организации (`scenarios/scenario-office-organization/`)
+- Linux стенд (`stands/scenario-linux-stand/`)
 - Все общие компоненты (Terraform модули, Ansible роли, документация)
 - Terraform и Ansible конфигурации для развертывания
 
@@ -95,7 +95,7 @@ cd scenarios/scenario-isp-company
 **Использование:**
 ```bash
 git checkout scenario-office-organization
-cd scenarios/scenario-office-organization
+cd stands/scenario-linux-stand
 # Следуйте инструкциям в README.md или QUICKSTART.md
 ```
 
@@ -112,20 +112,20 @@ cd scenarios/scenario-office-organization
 
 2. **Создание структуры сценария:**
    ```bash
-   mkdir -p scenarios/scenario-new-scenario
+   mkdir -p stands/scenario-new-stand
    # Создайте необходимые файлы
    ```
 
 3. **Коммит изменений:**
    ```bash
-   git add scenarios/scenario-new-scenario
+   git add stands/scenario-new-stand
    git commit -m "Добавлен новый сценарий"
    ```
 
 4. **Удаление других сценариев из ветки (опционально):**
    ```bash
    # Если хотите изолировать только свой сценарий
-   git rm -r scenarios/scenario-other-scenario
+   git rm -r stands/scenario-other-stand
    git commit -m "Изоляция сценария в ветке"
    ```
 
@@ -156,7 +156,7 @@ cd scenarios/scenario-office-organization
 
 2. **Развертывание:**
    ```bash
-   cd scenarios/scenario-isp-company
+   cd stands/scenario-windows-stand
    # Следуйте инструкциям в DEPLOYMENT.md или QUICKSTART.md
    ```
 
@@ -177,7 +177,7 @@ cd scenarios/scenario-office-organization
 ### Специфичные для сценария (только в соответствующей ветке)
 
 ```
-scenarios/
+stands/
 └── scenario-<name>/
     ├── README.md              # Описание сценария
     ├── QUICKSTART.md          # Быстрый старт

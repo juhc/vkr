@@ -7,7 +7,7 @@
 ## Общая структура сценария
 
 ```
-scenarios/
+stands/
 ├── scenario-1-unpatched-vulnerability/     # Сценарий 1: Непатченная уязвимость
 │   ├── README.md                          # Описание сценария
 │   ├── objectives.md                      # Цели обучения

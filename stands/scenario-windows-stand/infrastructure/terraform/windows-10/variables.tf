@@ -1,0 +1,97 @@
+# Переменные для рабочей станции Windows
+
+variable "proxmox_api_url" {
+  description = "URL API Proxmox"
+  type        = string
+}
+
+variable "proxmox_api_token_id" {
+  description = "Token ID для API Proxmox"
+  type        = string
+  sensitive   = true
+}
+
+variable "proxmox_api_token_secret" {
+  description = "Token Secret для API Proxmox"
+  type        = string
+  sensitive   = true
+}
+
+variable "proxmox_node" {
+  description = "Имя узла Proxmox"
+  type        = string
+}
+
+variable "proxmox_bridge" {
+  description = "Bridge в Proxmox (например vmbr0)"
+  type        = string
+  default     = "vmbr0"
+}
+
+variable "template_name" {
+  description = "Имя шаблона для клонирования (пустое для создания из ISO)"
+  type        = string
+  default     = ""
+}
+
+variable "storage" {
+  description = "Имя хранилища Proxmox"
+  type        = string
+}
+
+variable "windows_ws_name" {
+  description = "Имя виртуальной машины"
+  type        = string
+  default     = "windows-10-training"
+}
+
+variable "windows_ws_cores" {
+  description = "Количество ядер CPU"
+  type        = number
+  default     = 2
+}
+
+variable "windows_ws_memory" {
+  description = "Объем памяти в МБ"
+  type        = number
+  default     = 4096
+}
+
+variable "windows_ws_disk_size" {
+  description = "Размер диска"
+  type        = string
+  default     = "50G"
+}
+
+variable "windows_ws_ip" {
+  description = "IP адрес рабочей станции Windows"
+  type        = string
+  default     = "192.168.101.10"
+}
+
+# Админ-доступ (для администраторов стенда)
+variable "admin_user" {
+  description = "Пользователь с админскими правами (должен существовать в шаблоне)"
+  type        = string
+  default     = "ansible"
+}
+
+variable "bootstrap_admin_password" {
+  description = "Пароль, который 'вшит' в шаблон (нужен для первичного входа/смены)."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "admin_password" {
+  description = "Желаемый пароль администратора для этой VM (если пусто — не меняем)."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "admin_ssh_public_key" {
+  description = "Опционально: публичный SSH ключ для admin_user (добавится в authorized_keys через SSH)."
+  type        = string
+  default     = ""
+}

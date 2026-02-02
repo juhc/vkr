@@ -1,0 +1,28 @@
+# Пример конфигурации для рабочей станции Windows
+
+proxmox_api_url          = "https://proxmox.example.com:8006/api2/json"
+proxmox_api_token_id     = "terraform@pam!terraform-token"
+proxmox_api_token_secret = "your-secret-token-here"
+proxmox_node             = "pve"
+storage                  = "local-lvm"
+proxmox_bridge           = "vmbr0"
+
+# Имя шаблона (оставьте пустым для создания из ISO)
+template_name = "windows-10-template"
+
+# Параметры машины
+windows_ws_name     = "windows-10-training"
+windows_ws_cores    = 2
+windows_ws_memory   = 4096
+windows_ws_disk_size = "50G"
+windows_ws_ip       = "192.168.101.10"
+
+# Админ-доступ (должен существовать в шаблоне; рекомендуется `ansible`)
+admin_user = "ansible"
+
+# Пароль, который сейчас вшит в template (нужен Terraform, чтобы зайти по SSH и изменить/добавить ключ)
+bootstrap_admin_password = "PUT-TEMPLATE-PASSWORD-HERE"
+
+# Желаемые креды для администраторов стенда (можно оставить пустым, тогда не меняется)
+admin_password       = ""
+admin_ssh_public_key = "" # например: "ssh-ed25519 AAAA... user@host"

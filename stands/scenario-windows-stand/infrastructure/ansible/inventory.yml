@@ -1,0 +1,36 @@
+---
+# Ansible inventory для Windows стенда
+
+all:
+  children:
+    windows_workstation:
+      hosts:
+        windows-10:
+          ansible_host: 192.168.101.10
+          # Рекомендуется SSH (OpenSSH Server) + PowerShell shell.
+          # Если используете WinRM — см. отдельный пример (можно добавить рядом inventory.winrm.yml).
+          ansible_connection: ssh
+          ansible_user: ansible
+          ansible_password: "PUT-YOUR-PASSWORD-HERE"
+          ansible_shell_type: powershell
+          ansible_port: 22
+    
+    windows_server:
+      hosts:
+        windows-server:
+          ansible_host: 192.168.101.20
+          ansible_connection: ssh
+          ansible_user: ansible
+          ansible_password: "PUT-YOUR-PASSWORD-HERE"
+          ansible_shell_type: powershell
+          ansible_port: 22
+    
+    domain_controller:
+      hosts:
+        dc:
+          ansible_host: 192.168.101.30
+          ansible_connection: ssh
+          ansible_user: ansible
+          ansible_password: "PUT-YOUR-PASSWORD-HERE"
+          ansible_shell_type: powershell
+          ansible_port: 22

@@ -1,0 +1,22 @@
+- name: Stop/disable rsyslog (reduce logging)
+  ansible.builtin.service:
+    name: rsyslog
+    state: stopped
+    enabled: false
+  failed_when: false
+
+- name: Remove/stop auditd if present (best-effort)
+  ansible.builtin.service:
+    name: auditd
+    state: stopped
+    enabled: false
+  failed_when: false
+
+- name: Stop/disable systemd-journald (RHEL-family, best-effort)
+  ansible.builtin.service:
+    name: systemd-journald
+    state: stopped
+    enabled: false
+  when: ansible_os_family == "RedHat"
+  failed_when: false
+

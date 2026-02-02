@@ -1,0 +1,12 @@
+# Пример var-file для Windows Server 2016 (НЕсекретный)
+iso_file        = "local:iso/WindowsServer_2016_unattend.iso"
+virtio_iso_file = "local:iso/virtio-win-0.1.285.iso"
+
+vm_name   = "windows-server-2016-template"
+vm_id     = 9216
+cpu_cores = 2
+memory    = 4096
+disk_size = "80G"
+
+windows_edition = "Windows Server 2016 Standard"
+

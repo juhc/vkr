@@ -1,0 +1,17 @@
+- name: Validate vuln_enabled IDs
+  ansible.builtin.assert:
+    that:
+      - (vuln_enabled | default([])) is iterable
+      - (vuln_enabled | difference(vkr_vuln_linux_known)) | length == 0
+    fail_msg: >-
+      Unknown Linux vulnerability IDs: {{
+        (vuln_enabled | difference(vkr_vuln_linux_known)) | join(', ')
+      }}.
+      Known: {{ vkr_vuln_linux_known | join(', ') }}
+
+- name: Apply enabled Linux vulnerabilities
+  ansible.builtin.include_tasks: "vulns/{{ item }}.yml"
+  loop: "{{ vuln_enabled }}"
+  loop_control:
+    label: "{{ item }}"
+

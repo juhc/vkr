@@ -39,7 +39,7 @@ git checkout main
 git checkout scenario-isp-company
 
 # Перейти в директорию сценария
-cd scenarios/scenario-isp-company
+cd stands/scenario-windows-stand
 
 # Просмотреть структуру
 ls -la
@@ -48,7 +48,7 @@ ls -la
 #### Структура файлов
 
 ```
-scenarios/scenario-isp-company/
+stands/scenario-windows-stand/
 ├── README.md              # Описание сценария
 ├── QUICKSTART.md          # Быстрый старт
 ├── DEPLOYMENT.md          # Инструкции по развертыванию
@@ -65,14 +65,14 @@ git checkout scenario-isp-company
 
 # 2. Внесите изменения в файлы
 # Например, отредактируйте README.md
-nano scenarios/scenario-isp-company/README.md
+nano stands/scenario-windows-stand/README.md
 
 # 3. Проверьте изменения
 git status
 git diff
 
 # 4. Добавьте изменения
-git add scenarios/scenario-isp-company/README.md
+git add stands/scenario-windows-stand/README.md
 
 # 5. Закоммитьте
 git commit -m "Обновлен README для ISP сценария"
@@ -90,7 +90,7 @@ git push origin scenario-isp-company
 git checkout scenario-office-organization
 
 # Перейти в директорию сценария
-cd scenarios/scenario-office-organization
+cd stands/scenario-linux-stand
 
 # Просмотреть структуру
 ls -la
@@ -99,7 +99,7 @@ ls -la
 #### Структура файлов
 
 ```
-scenarios/scenario-office-organization/
+stands/scenario-linux-stand/
 ├── README.md
 ├── QUICKSTART.md
 ├── DEPLOYMENT.md
@@ -128,14 +128,14 @@ git checkout scenario-office-organization
 
 # 2. Внесите изменения
 # Например, измените Terraform конфигурацию
-nano scenarios/scenario-office-organization/infrastructure/terraform/main.tf
+nano stands/scenario-linux-stand/infrastructure/terraform/linux-server/main.tf
 
 # 3. Проверьте изменения
 git status
 git diff
 
 # 4. Добавьте и закоммитьте
-git add scenarios/scenario-office-organization/infrastructure/terraform/main.tf
+git add stands/scenario-linux-stand/infrastructure/terraform/linux-server/main.tf
 git commit -m "Обновлена Terraform конфигурация"
 
 # 5. Опубликуйте
@@ -186,9 +186,9 @@ git push origin scenario-office-organization
 ```bash
 # 1. Обновите в main
 git checkout main
-nano ansible/roles/web-server-apache/tasks/main.yml
+nano ansible/roles/vkr_vuln_linux/tasks/main.yml
 git add ansible/roles/
-git commit -m "Обновлена роль web-server-apache"
+git commit -m "Обновлены роли Ansible"
 git push origin main
 
 # 2. Синхронизируйте с ветками
@@ -210,10 +210,10 @@ git push origin scenario-office-organization
 git checkout scenario-isp-company
 
 # 2. Создайте новый файл
-nano scenarios/scenario-isp-company/NEW_FILE.md
+nano stands/scenario-windows-stand/NEW_FILE.md
 
 # 3. Добавьте и закоммитьте
-git add scenarios/scenario-isp-company/NEW_FILE.md
+git add stands/scenario-windows-stand/NEW_FILE.md
 git commit -m "Добавлен новый файл в ISP сценарий"
 
 # 4. Опубликуйте
@@ -227,13 +227,13 @@ git push origin scenario-isp-company
 git checkout scenario-office-organization
 
 # 2. Отредактируйте файл
-nano scenarios/scenario-office-organization/README.md
+nano stands/scenario-linux-stand/README.md
 
 # 3. Проверьте изменения
-git diff scenarios/scenario-office-organization/README.md
+git diff stands/scenario-linux-stand/README.md
 
 # 4. Закоммитьте
-git add scenarios/scenario-office-organization/README.md
+git add stands/scenario-linux-stand/README.md
 git commit -m "Обновлена документация офисного сценария"
 
 # 5. Опубликуйте
@@ -247,16 +247,16 @@ git push origin scenario-office-organization
 git checkout scenario-office-organization
 
 # 2. Измените конфигурацию
-nano scenarios/scenario-office-organization/infrastructure/terraform/main.tf
+nano stands/scenario-linux-stand/infrastructure/terraform/linux-server/main.tf
 
 # 3. Проверьте синтаксис (если установлен terraform)
-cd scenarios/scenario-office-organization/infrastructure/terraform
+cd stands/scenario-linux-stand/infrastructure/terraform/linux-server
 terraform fmt
 terraform validate
 
 # 4. Вернитесь в корень и закоммитьте
 cd ../../../../..
-git add scenarios/scenario-office-organization/infrastructure/terraform/
+git add stands/scenario-linux-stand/infrastructure/terraform/
 git commit -m "Обновлена Terraform конфигурация"
 
 # 5. Опубликуйте
@@ -270,13 +270,13 @@ git push origin scenario-office-organization
 git checkout scenario-office-organization
 
 # 2. Измените плейбук
-nano scenarios/scenario-office-organization/infrastructure/ansible/playbook.yml
+nano stands/scenario-linux-stand/infrastructure/ansible/linux-server/playbook.yml
 
 # 3. Проверьте синтаксис (если установлен ansible-lint)
-ansible-lint scenarios/scenario-office-organization/infrastructure/ansible/playbook.yml
+ansible-lint stands/scenario-linux-stand/infrastructure/ansible/linux-server/playbook.yml
 
 # 4. Закоммитьте
-git add scenarios/scenario-office-organization/infrastructure/ansible/
+git add stands/scenario-linux-stand/infrastructure/ansible/
 git commit -m "Обновлен Ansible плейбук"
 
 # 5. Опубликуйте
@@ -331,13 +331,13 @@ git commit -m "Разрешен конфликт при слиянии с main"
 git log --oneline
 
 # История конкретного файла
-git log --oneline scenarios/scenario-isp-company/README.md
+git log --oneline stands/scenario-windows-stand/README.md
 
 # Графическое представление всех веток
 git log --oneline --graph --all
 
 # Показать изменения в файле
-git diff HEAD scenarios/scenario-isp-company/README.md
+git diff HEAD stands/scenario-windows-stand/README.md
 ```
 
 ### Отмена изменений
@@ -447,11 +447,11 @@ git push --all origin
 git checkout scenario-isp-company
 
 # 2. Обновите документацию
-nano scenarios/scenario-isp-company/machine-scenarios.md
+nano stands/scenario-windows-stand/machine-scenarios.md
 # Добавьте описание новой машины
 
 # 3. Обновите сетевую топологию
-nano scenarios/scenario-isp-company/network-topology.md
+nano stands/scenario-windows-stand/network-topology.md
 # Добавьте новую машину в топологию
 
 # 4. Проверьте изменения
@@ -459,7 +459,7 @@ git status
 git diff
 
 # 5. Закоммитьте
-git add scenarios/scenario-isp-company/
+git add stands/scenario-windows-stand/
 git commit -m "Добавлена новая машина в ISP сценарий"
 
 # 6. Опубликуйте
@@ -471,9 +471,9 @@ git push origin scenario-isp-company
 ```bash
 # 1. Обновите в main
 git checkout main
-nano ansible/roles/database-mysql/tasks/main.yml
-git add ansible/roles/database-mysql/
-git commit -m "Обновлена роль database-mysql"
+nano ansible/roles/vkr_accounts/tasks/linux.yml
+git add ansible/roles/vkr_accounts/
+git commit -m "Обновлена роль vkr_accounts"
 git push origin main
 
 # 2. Синхронизируйте с ISP-сценарием

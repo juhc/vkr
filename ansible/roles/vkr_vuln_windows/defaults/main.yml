@@ -1,0 +1,18 @@
+vuln_enabled: []
+
+vkr_vuln_windows_weak_password: "password"
+vkr_vuln_windows_testadmin_user: "TestAdmin"
+
+vkr_vuln_windows_known:
+  - windows.auth.weak_admin_password
+  - windows.auth.no_password_policy
+  - windows.auth.guest_enabled
+  - windows.priv.testadmin_in_admins
+  - windows.remote.rdp_enabled
+  - windows.firewall.disabled
+  - windows.updates.disabled
+  - windows.defender.disabled
+  - windows.network.smb1_enabled
+  - windows.network.ntlmv1_enabled
+  - windows.audit.disabled
+

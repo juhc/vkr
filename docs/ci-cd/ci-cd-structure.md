@@ -143,9 +143,9 @@ jobs:
         
     - name: Ansible Syntax Check
       run: |
-        ansible-playbook --syntax-check ansible/playbooks/scenarios/scenario-1-unpatched.yml
-        ansible-playbook --syntax-check ansible/playbooks/scenarios/scenario-2-misconfig.yml
-        ansible-playbook --syntax-check ansible/playbooks/scenarios/scenario-3-insider.yml
+        ansible-playbook --syntax-check ansible/playbooks/stands/stand-1-unpatched.yml
+        ansible-playbook --syntax-check ansible/playbooks/stands/stand-2-misconfig.yml
+        ansible-playbook --syntax-check ansible/playbooks/stands/stand-3-insider.yml
         
     - name: Molecule Test
       run: |
@@ -255,25 +255,25 @@ jobs:
         
     - name: Deploy scenario
       run: |
-        cd scenarios/${{ matrix.scenario }}/infrastructure/terraform
+        cd stands/${{ matrix.scenario }}/infrastructure/terraform
         terraform init
         terraform plan -var-file="test.tfvars"
         terraform apply -auto-approve -var-file="test.tfvars"
         
     - name: Run Ansible configuration
       run: |
-        cd scenarios/${{ matrix.scenario }}/infrastructure/ansible
+        cd stands/${{ matrix.scenario }}/infrastructure/ansible
         ansible-playbook -i inventory.yml playbook.yml
         
     - name: Test scenario functionality
       run: |
         # Запуск тестов функциональности
-        python tests/scenarios/test_${{ matrix.scenario }}.py
+        python tests/stands/test_${{ matrix.scenario }}.py
         
     - name: Cleanup test environment
       if: always()
       run: |
-        cd scenarios/${{ matrix.scenario }}/infrastructure/terraform
+        cd stands/${{ matrix.scenario }}/infrastructure/terraform
         terraform destroy -auto-approve -var-file="test.tfvars"
         docker-compose -f tests/docker-compose.yml down
 ```
@@ -286,11 +286,11 @@ on:
   push:
     branches: [ main, develop ]
     paths:
-      - 'scenarios/**'
+      - 'stands/**'
   pull_request:
     branches: [ main ]
     paths:
-      - 'scenarios/**'
+      - 'stands/**'
 
 jobs:
   scenario-test:
@@ -317,17 +317,17 @@ jobs:
     - name: Run vulnerability tests
       run: |
         # Тестирование уязвимостей
-        python tests/scenarios/test_vulnerabilities.py --scenario ${{ matrix.scenario }}
+        python tests/stands/test_vulnerabilities.py --stand ${{ matrix.scenario }}
         
     - name: Run exploitation tests
       run: |
         # Тестирование эксплуатации
-        python tests/scenarios/test_exploitation.py --scenario ${{ matrix.scenario }}
+        python tests/stands/test_exploitation.py --stand ${{ matrix.scenario }}
         
     - name: Run remediation tests
       run: |
         # Тестирование устранения
-        python tests/scenarios/test_remediation.py --scenario ${{ matrix.scenario }}
+        python tests/stands/test_remediation.py --stand ${{ matrix.scenario }}
         
     - name: Generate test report
       run: |
@@ -438,7 +438,7 @@ jobs:
         tar -czf release/ansible-roles.tar.gz ansible/roles/
         
         # Сценарии
-        tar -czf release/scenarios.tar.gz scenarios/
+        tar -czf release/stands.tar.gz stands/
         
         # Документация
         mkdocs build
@@ -626,7 +626,7 @@ updates:
 /ansible/ @devops-team @automation-team
 
 # Сценарии
-/scenarios/ @security-team @education-team
+/stands/ @security-team @education-team
 
 # Документация
 /docs/ @documentation-team @education-team
@@ -683,9 +683,9 @@ terraform fmt -check -recursive terraform/
 
 # Проверка синтаксиса Ansible
 echo "Проверка синтаксиса Ansible..."
-ansible-playbook --syntax-check ansible/playbooks/scenarios/scenario-1-unpatched.yml
-ansible-playbook --syntax-check ansible/playbooks/scenarios/scenario-2-misconfig.yml
-ansible-playbook --syntax-check ansible/playbooks/scenarios/scenario-3-insider.yml
+ansible-playbook --syntax-check ansible/playbooks/stands/stand-1-unpatched.yml
+ansible-playbook --syntax-check ansible/playbooks/stands/stand-2-misconfig.yml
+ansible-playbook --syntax-check ansible/playbooks/stands/stand-3-insider.yml
 
 # Проверка безопасности
 echo "Проверка безопасности..."

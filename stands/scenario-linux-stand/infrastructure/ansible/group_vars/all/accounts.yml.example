@@ -1,0 +1,27 @@
+---
+# Наборы пользователей/групп для Linux стенда.
+#
+# Как использовать:
+# 1) Скопируйте в accounts.yml (локально/через vault) и отредактируйте
+# 2) Playbook возьмёт profiles и передаст в роль vkr_accounts
+#
+# Рекомендация: реальные пароли хранить через Ansible Vault.
+
+accounts_profiles:
+  linux_workstation:
+    groups: ["sudo"]
+    users:
+      - name: ansible
+        # password: "StrongTempPass123!"   # опционально (для входа по паролю)
+        groups: ["sudo"]
+        ssh_public_keys:
+          - "ssh-ed25519 AAAA... admin@laptop"
+
+  linux_server:
+    groups: ["sudo"]
+    users:
+      - name: ansible
+        groups: ["sudo"]
+        ssh_public_keys:
+          - "ssh-ed25519 AAAA... admin@laptop"
+

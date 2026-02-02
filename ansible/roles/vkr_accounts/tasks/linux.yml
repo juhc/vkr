@@ -1,0 +1,45 @@
+- name: Create Linux groups
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ vkr_accounts_groups }}"
+
+- name: Ensure openssh-server is present (best-effort)
+  ansible.builtin.package:
+    name: openssh-server
+    state: present
+  failed_when: false
+
+- name: Ensure SSH service is running (best-effort)
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - ssh
+    - sshd
+  failed_when: false
+
+- name: Create/update Linux users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    password: "{{ (item.password | default('')) | length > 0 | ternary((item.password | password_hash('sha512')), omit) }}"
+    groups: "{{ (item.groups | default([])) | join(',') if (item.groups | default([])) | length > 0 else omit }}"
+    append: true
+    shell: /bin/bash
+    create_home: true
+    state: present
+  loop: "{{ vkr_accounts_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Add SSH authorized_keys for Linux users
+  ansible.posix.authorized_key:
+    user: "{{ item.0.name }}"
+    key: "{{ item.1 }}"
+    state: present
+  loop: "{{ vkr_accounts_users | subelements('ssh_public_keys', skip_missing=True) }}"
+  loop_control:
+    label: "{{ item.0.name }}"
+  when: (item.1 | default('')) | length > 0
+

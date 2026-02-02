@@ -1,0 +1,4 @@
+- name: Enable Guest account
+  ansible.windows.win_shell: |
+    net user guest /active:yes
+

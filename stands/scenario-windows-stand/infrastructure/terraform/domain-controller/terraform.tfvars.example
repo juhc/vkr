@@ -1,0 +1,27 @@
+# Пример конфигурации для Domain Controller
+
+proxmox_api_url          = "https://proxmox.example.com:8006/api2/json"
+proxmox_api_token_id     = "terraform@pam!terraform-token"
+proxmox_api_token_secret = "your-secret-token-here"
+proxmox_node             = "pve"
+storage                  = "local-lvm"
+proxmox_bridge           = "vmbr0"
+
+# Имя шаблона (оставьте пустым для создания из ISO)
+template_name = "windows-server-2019-template"
+
+# Параметры машины
+dc_name     = "domain-controller-training"
+dc_cores    = 4
+dc_memory   = 8192
+dc_disk_size = "100G"
+dc_ip       = "192.168.101.30"
+
+# Параметры домена
+domain_name = "training.local"
+
+# Админ-доступ (должен существовать в шаблоне; рекомендуется `ansible`)
+admin_user = "ansible"
+bootstrap_admin_password = "PUT-TEMPLATE-PASSWORD-HERE"
+admin_password       = ""
+admin_ssh_public_key = ""

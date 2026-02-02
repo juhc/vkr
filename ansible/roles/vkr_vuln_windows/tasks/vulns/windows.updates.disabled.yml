@@ -1,0 +1,11 @@
+- name: Disable Windows Update services (best-effort)
+  ansible.windows.win_service:
+    name: "{{ item }}"
+    start_mode: disabled
+    state: stopped
+  loop:
+    - wuauserv
+    - usosvc
+    - WaaSMedicSvc
+  failed_when: false
+

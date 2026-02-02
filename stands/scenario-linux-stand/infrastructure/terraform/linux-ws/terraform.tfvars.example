@@ -1,0 +1,31 @@
+# Пример конфигурации для рабочей станции Linux (Desktop)
+
+proxmox_api_url          = "https://127.0.0.1:8006/api2/json"
+proxmox_api_token_id     = "packer@pam!packer-token"
+proxmox_api_token_secret = "PUT-YOUR-SECRET-HERE"
+proxmox_node             = "pve"
+storage                  = "local-lvm"
+proxmox_bridge           = "vmbr0"
+
+# Имя шаблона (cloud-init template, созданный через packer/cloudinit)
+template_name = "debian-cloudinit-template-uefi"
+
+# Параметры машины
+linux_ws_name     = "linux-ws-training"
+linux_ws_cores    = 2
+linux_ws_memory   = 4096
+linux_ws_disk_size = "50G"
+linux_ws_ip       = "192.168.102.10"
+linux_ws_user     = "ansible"
+linux_ws_password = "" # опционально: пароль для входа в консоль/SSH по паролю
+
+# Сеть: DHCP или static
+use_dhcp    = false
+cidr_prefix = 24
+
+# Сеть
+gateway    = "192.168.102.1"
+nameserver = "8.8.8.8"
+
+# SSH ключ (оставьте пустым для автоматического определения)
+ssh_public_key = ""

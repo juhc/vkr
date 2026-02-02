@@ -1,0 +1,29 @@
+# --- Secrets / локальные переменные ---
+**/variables.secrets.pkrvars.hcl
+**/variables.secrets.pkrvars.json
+**/*secret*
+**/*.pem
+**/*.key
+**/accounts.yml
+
+# Terraform local state / планы / локальные vars
+**/.terraform/
+**/terraform.tfstate
+**/terraform.tfstate.*
+**/tfplan
+**/*.tfvars
+**/terraform.tfvars
+
+# Packer / build cache
+**/packer_cache/
+**/.packer.d/
+**/packer.log
+**/packer-build.log
+
+# ISO / большие артефакты (не храним в репозитории)
+**/*.iso
+**/*.qcow2
+
+# OS junk
+**/Thumbs.db
+**/Desktop.ini

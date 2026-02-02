@@ -33,7 +33,7 @@
 
 - **[Структура Ansible](structure/ansible-structure.md)** — организация Ansible конфигураций, ролей и плейбуков
 - **[Структура Terraform](structure/terraform-modules-structure.md)** — модули и конфигурации Terraform
-- **[Структура сценариев](structure/scenarios-structure.md)** — организация учебных сценариев
+- **[Структура стендов](structure/scenarios-structure.md)** — организация учебных стендов
 - **[Шаблон структуры проекта](structure/project-structure-template.md)** — рекомендуемая структура для новых проектов
 - **[Структура документации](structure/documentation-structure.md)** — организация документации в проекте
 
@@ -57,17 +57,17 @@
 1. **Изучите ошибки безопасности**: [Ошибки безопасности](technical/SECURITY_MISTAKES.md) для понимания учебных сценариев
 2. **Ознакомьтесь со структурой сценариев**: [Структура сценариев](structure/scenarios-structure.md)
 3. **Изучите руководства по веткам**: [Руководство по веткам](guides/GUIDE_BRANCHES.md)
-4. **Изучите цели обучения** в конкретных сценариях:
-   - [ISP компания](../scenarios/scenario-isp-company/docs/learning/objectives.md)
-   - [Офисная организация](../scenarios/scenario-office-organization/objectives.md)
+4. **Изучите цели обучения** в конкретных стендах:
+   - [Windows стенд](../stands/scenario-windows-stand/README.md)
+   - [Linux стенд](../stands/scenario-linux-stand/README.md)
 
 ### Для студентов
 
 1. **Ознакомьтесь с ошибками безопасности**: [Ошибки безопасности](technical/SECURITY_MISTAKES.md) для понимания изучаемых уязвимостей
 2. **Изучите быструю справку**: [Быстрая справка](guides/QUICK_REFERENCE.md)
-3. **Следуйте инструкциям в сценариях**:
-   - [ISP компания](../scenarios/scenario-isp-company/README.md)
-   - [Офисная организация](../scenarios/scenario-office-organization/README.md)
+3. **Следуйте инструкциям в стендах**:
+   - [Windows стенд](../stands/scenario-windows-stand/README.md)
+   - [Linux стенд](../stands/scenario-linux-stand/README.md)
 
 ---
 
@@ -115,15 +115,14 @@
 - **Terraform** → [technical/TECHNOLOGIES.md](technical/TECHNOLOGIES.md#terraform)
 - **Ansible** → [technical/TECHNOLOGIES.md](technical/TECHNOLOGIES.md#ansible)
 - **Уязвимости** → [technical/SECURITY_MISTAKES.md](technical/SECURITY_MISTAKES.md)
-- **Создание сценария** → [../templates/scenario-template/](../templates/scenario-template/)
+- **Стенды** → [../stands/](../stands/)
 
 ---
 
 ## 📖 Дополнительные ресурсы
 
 - [Основной README проекта](../README.md)
-- [Шаблон сценария](../templates/scenario-template/)
-- [Сценарии](../scenarios/)
+- [Стенды](../stands/)
 
 ---
 

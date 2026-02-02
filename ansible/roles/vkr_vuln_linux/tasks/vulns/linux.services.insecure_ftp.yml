@@ -1,0 +1,26 @@
+- name: Install vsftpd (insecure FTP example)
+  ansible.builtin.package:
+    name: vsftpd
+    state: present
+  failed_when: false
+
+- name: Configure vsftpd to allow anonymous and write (insecure)
+  ansible.builtin.blockinfile:
+    path: /etc/vsftpd.conf
+    marker: "# {mark} VKR VULN"
+    block: |
+      anonymous_enable=YES
+      local_enable=YES
+      write_enable=YES
+      anon_upload_enable=YES
+      anon_mkdir_write_enable=YES
+      chroot_local_user=NO
+  failed_when: false
+
+- name: Enable/Start vsftpd
+  ansible.builtin.service:
+    name: vsftpd
+    state: started
+    enabled: true
+  failed_when: false
+

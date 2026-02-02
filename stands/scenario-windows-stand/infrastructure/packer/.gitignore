@@ -1,0 +1,10 @@
+# Не коммитим чувствительные переменные
+variables.secrets.pkrvars.hcl
+**/variables.secrets.pkrvars.hcl
+
+# Логи packer (часто содержат адреса/учётки)
+packer.log
+packer-build.log
+**/packer.log
+**/packer-build.log
+

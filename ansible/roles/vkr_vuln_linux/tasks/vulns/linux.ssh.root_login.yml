@@ -1,0 +1,8 @@
+- name: Allow SSH root login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^\s*PermitRootLogin\s+'
+    line: 'PermitRootLogin yes'
+    create: yes
+  notify: Restart SSH
+

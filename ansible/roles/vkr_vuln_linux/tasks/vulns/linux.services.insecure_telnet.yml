@@ -1,0 +1,51 @@
+- name: Install telnet daemon (Debian/Ubuntu)
+  ansible.builtin.package:
+    name:
+      - inetutils-telnetd
+    state: present
+  when: ansible_os_family == "Debian"
+  failed_when: false
+
+- name: Enable/Start telnet service (Debian/Ubuntu, best-effort)
+  ansible.builtin.service:
+    name: inetutils-telnetd
+    state: started
+    enabled: true
+  when: ansible_os_family == "Debian"
+  failed_when: false
+
+- name: Install telnet-server + xinetd (RHEL-family, best-effort)
+  ansible.builtin.package:
+    name:
+      - telnet-server
+      - xinetd
+    state: present
+  when: ansible_os_family == "RedHat"
+  failed_when: false
+
+- name: Enable telnet in xinetd config (RHEL-family, best-effort)
+  ansible.builtin.copy:
+    dest: /etc/xinetd.d/telnet
+    mode: "0644"
+    content: |
+      service telnet
+      {
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = no
+        user            = root
+        server          = /usr/sbin/in.telnetd
+        log_on_failure  += USERID
+      }
+  when: ansible_os_family == "RedHat"
+  failed_when: false
+
+- name: Enable/Start xinetd (RHEL-family, best-effort)
+  ansible.builtin.service:
+    name: xinetd
+    state: started
+    enabled: true
+  when: ansible_os_family == "RedHat"
+  failed_when: false
+

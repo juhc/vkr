@@ -87,7 +87,7 @@ cyber-range-lab/
 │   │   │   ├── web-vulnerabilities.yml
 │   │   │   ├── system-vulnerabilities.yml
 │   │   │   └── network-vulnerabilities.yml
-│   │   └── scenarios/                # Плейбуки сценариев
+│   │   └── stands/                   # Плейбуки стендов
 │   │       ├── scenario-1.yml
 │   │       ├── scenario-2.yml
 │   │       └── scenario-3.yml
@@ -99,25 +99,25 @@ cyber-range-lab/
 │   │   ├── web-server/              # Веб-сервер
 │   │   │   ├── tasks/main.yml
 │   │   │   ├── handlers/main.yml
-│   │   │   ├── templates/
+│   │   │   ├── (опционально) шаблоны/
 │   │   │   ├── files/
 │   │   │   └── vars/main.yml
 │   │   ├── database/                # База данных
 │   │   │   ├── tasks/main.yml
 │   │   │   ├── handlers/main.yml
-│   │   │   ├── templates/
+│   │   │   ├── (опционально) шаблоны/
 │   │   │   ├── files/
 │   │   │   └── vars/main.yml
 │   │   ├── firewall/                # Брандмауэр
 │   │   │   ├── tasks/main.yml
 │   │   │   ├── handlers/main.yml
-│   │   │   ├── templates/
+│   │   │   ├── (опционально) шаблоны/
 │   │   │   ├── files/
 │   │   │   └── vars/main.yml
 │   │   └── monitoring/              # Мониторинг
 │   │       ├── tasks/main.yml
 │   │       ├── handlers/main.yml
-│   │       ├── templates/
+│   │       ├── (опционально) шаблоны/
 │   │       ├── files/
 │   │       └── vars/main.yml
 │   ├── inventories/                 # Инвентари
@@ -144,7 +144,7 @@ cyber-range-lab/
 │       ├── secrets.yml              # Секреты
 │       └── passwords.yml            # Пароли
 │
-├── scenarios/                        # Учебные сценарии
+├── stands/                           # Учебные стенды
 │   ├── scenario-1-unpatched-vulnerability/  # Сценарий 1: Непатченная уязвимость
 │   │   ├── README.md                # Главная навигация сценария
 │   │   ├── docs/                    # Документация сценария
@@ -220,13 +220,13 @@ cyber-range-lab/
 │   │   ├── molecule/              # Molecule тесты
 │   │   ├── lint/                   # Линтеры
 │   │   └── security/               # Тесты безопасности
-│   ├── scenarios/                  # Тесты сценариев
+│   ├── stands/                     # Тесты стендов
 │   │   ├── functional/             # Функциональные тесты
 │   │   ├── performance/            # Тесты производительности
 │   │   └── security/               # Тесты безопасности
 │   └── e2e/                        # End-to-end тесты
 │       ├── deployment/             # Тесты развертывания
-│       ├── scenarios/              # Тесты сценариев
+│       ├── stands/                 # Тесты стендов
 │       └── cleanup/                # Тесты очистки
 │
 ├── .github/                        # GitHub Actions
@@ -289,7 +289,7 @@ cyber-range-lab/
 │   ├── logs/                      # Логи (если нужны)
 │   └── backups/                   # Резервные копии
 │
-└── templates/                     # Шаблоны
+└── (опционально) шаблоны/         # Шаблоны (если нужны)
     ├── scenario-template/         # Шаблон сценария
     │   ├── README.md.template
     │   ├── infrastructure/
@@ -327,7 +327,7 @@ cyber-range-lab/
 - **inventories/** - Инвентари для разных окружений
 - **vault/** - Зашифрованные секреты
 
-### 5. Сценарии (scenarios/)
+### 5. Стенды (stands/)
 Каждый сценарий содержит:
 - **README.md** - главная навигация сценария
 - **docs/** - структурированная документация:
@@ -380,7 +380,7 @@ cyber-range-lab/
 - База данных уязвимостей
 - Логи и резервные копии
 
-### 12. Шаблоны (templates/)
+### 12. Шаблоны (опционально)
 Шаблоны для быстрого создания новых компонентов:
 - Шаблон сценария
 - Шаблон модуля Terraform

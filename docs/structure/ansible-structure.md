@@ -172,7 +172,7 @@ playbooks/
 │   ├── system-vulnerabilities.yml # Системные уязвимости
 │   ├── network-vulnerabilities.yml # Сетевые уязвимости
 │   └── database-vulnerabilities.yml # Уязвимости БД
-├── scenarios/                   # Плейбуки сценариев
+├── stands/                      # Плейбуки стендов
 │   ├── scenario-1-unpatched.yml # Сценарий 1: Непатченная уязвимость
 │   ├── scenario-2-misconfig.yml # Сценарий 2: Неправильная конфигурация
 │   └── scenario-3-insider.yml   # Сценарий 3: Инсайдерская угроза
@@ -339,7 +339,7 @@ roles/
 │   ├── system-update/            # Обновление системы
 │   │   ├── tasks/main.yml
 │   │   ├── handlers/main.yml
-│   │   ├── templates/
+│   │   ├── (опционально) шаблоны/
 │   │   ├── files/
 │   │   ├── vars/main.yml
 │   │   ├── defaults/main.yml
@@ -378,7 +378,7 @@ roles/
 apache/
 ├── tasks/main.yml
 ├── handlers/main.yml
-├── templates/
+├── (опционально) шаблоны/
 │   ├── apache2.conf.j2
 │   ├── 000-default.conf.j2
 │   └── ssl.conf.j2
@@ -640,7 +640,7 @@ ansible-playbook \
     -i "$INVENTORY_FILE" \
     --vault-password-file "$VAULT_PASSWORD_FILE" \
     --extra-vars "scenario_name=$SCENARIO_NAME" \
-    "playbooks/scenarios/scenario-${SCENARIO_NAME}.yml"
+    "playbooks/stands/stand-${STAND_NAME}.yml"
 
 echo "Сценарий $SCENARIO_NAME успешно развернут"
 ```

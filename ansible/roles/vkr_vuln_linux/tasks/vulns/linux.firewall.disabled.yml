@@ -1,0 +1,19 @@
+- name: Disable UFW (if present)
+  ansible.builtin.command: ufw disable
+  changed_when: false
+  failed_when: false
+
+- name: Stop/disable ufw service (if present)
+  ansible.builtin.service:
+    name: ufw
+    state: stopped
+    enabled: false
+  failed_when: false
+
+- name: Stop/disable firewalld (if present)
+  ansible.builtin.service:
+    name: firewalld
+    state: stopped
+    enabled: false
+  failed_when: false
+

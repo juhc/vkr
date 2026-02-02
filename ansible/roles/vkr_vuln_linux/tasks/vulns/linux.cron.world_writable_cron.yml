@@ -1,0 +1,15 @@
+- name: Create insecure root cron job with world-writable permissions
+  ansible.builtin.copy:
+    dest: /etc/cron.d/vkr-insecure
+    mode: "0777"
+    content: |
+      * * * * * root /tmp/backup.sh
+
+- name: Create world-writable cron script in /tmp (insecure PATH / permissions)
+  ansible.builtin.copy:
+    dest: /tmp/backup.sh
+    mode: "0777"
+    content: |
+      #!/bin/sh
+      echo "backup ok" >> /var/log/backup.log
+

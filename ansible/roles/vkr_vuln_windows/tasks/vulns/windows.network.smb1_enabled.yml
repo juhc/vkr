@@ -1,0 +1,9 @@
+- name: Enable SMBv1 (best-effort, different commands for client/server)
+  ansible.windows.win_shell: |
+    if (Get-Command Install-WindowsFeature -ErrorAction SilentlyContinue) {
+      Install-WindowsFeature FS-SMB1 -IncludeAllSubFeature
+    } else {
+      Enable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart
+    }
+  failed_when: false
+

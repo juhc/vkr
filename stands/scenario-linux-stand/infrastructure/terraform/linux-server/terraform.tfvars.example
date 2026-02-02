@@ -1,0 +1,31 @@
+# Пример конфигурации для Linux сервера
+
+proxmox_api_url          = "https://127.0.0.1:8006/api2/json"
+proxmox_api_token_id     = "packer@pam!packer-token"
+proxmox_api_token_secret = "PUT-YOUR-SECRET-HERE"
+proxmox_node             = "pve"
+storage                  = "local-lvm"
+proxmox_bridge           = "vmbr0"
+
+# Имя шаблона (cloud-init template, созданный через packer/cloudinit)
+template_name = "debian-cloudinit-template-uefi"
+
+# Параметры машины
+linux_server_name     = "linux-server-training"
+linux_server_cores    = 2
+linux_server_memory   = 8192
+linux_server_disk_size = "100G"
+linux_server_ip       = "192.168.102.20"
+linux_server_user     = "ansible"
+linux_server_password = "" # опционально: пароль для входа в консоль/SSH по паролю
+
+# Сеть: DHCP или static
+use_dhcp    = false
+cidr_prefix = 24
+
+# Сеть
+gateway    = "192.168.102.1"
+nameserver = "8.8.8.8"
+
+# SSH ключ (оставьте пустым для автоматического определения)
+ssh_public_key = ""

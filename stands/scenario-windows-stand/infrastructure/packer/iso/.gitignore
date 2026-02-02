@@ -1,0 +1,7 @@
+# Игнорировать все ISO файлы в этой директории
+*.iso
+*.ISO
+
+# Но оставить README.md
+!README.md
+!.gitignore

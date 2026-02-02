@@ -1,0 +1,4 @@
+- name: Disable Windows Firewall (all profiles)
+  ansible.windows.win_shell: |
+    Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+

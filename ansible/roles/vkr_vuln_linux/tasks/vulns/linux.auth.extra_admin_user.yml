@@ -1,0 +1,9 @@
+- name: Create extra admin user (unnecessary privileged account)
+  ansible.builtin.user:
+    name: "{{ vkr_vuln_linux_extra_admin_user }}"
+    groups: sudo
+    append: true
+    password: "{{ vkr_vuln_linux_weak_password | password_hash('sha512') }}"
+    shell: /bin/bash
+    create_home: true
+
