@@ -186,7 +186,7 @@ git push origin scenario-office-organization
 ```bash
 # 1. Обновите в main
 git checkout main
-nano ansible/roles/vkr_vuln_linux/tasks/main.yml
+nano ansible/roles/vuln_linux/tasks/main.yml
 git add ansible/roles/
 git commit -m "Обновлены роли Ansible"
 git push origin main
@@ -471,9 +471,9 @@ git push origin scenario-isp-company
 ```bash
 # 1. Обновите в main
 git checkout main
-nano ansible/roles/vkr_accounts/tasks/linux.yml
-git add ansible/roles/vkr_accounts/
-git commit -m "Обновлена роль vkr_accounts"
+nano ansible/roles/accounts/tasks/linux.yml
+git add ansible/roles/accounts/
+git commit -m "Обновлена роль accounts"
 git push origin main
 
 # 2. Синхронизируйте с ISP-сценарием

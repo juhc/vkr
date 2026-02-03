@@ -1,0 +1,9 @@
+---
+ad_join_enabled: false
+
+ad_domain_name: ""
+ad_dc_ip: ""
+ad_join_user: ""
+ad_join_password: ""
+
+ad_configure_dns: true

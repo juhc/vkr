@@ -1,0 +1,51 @@
+# Роль `vuln_windows`
+
+Роль применяет **набор учебных уязвимостей** на Windows-хосте по списку ID.
+
+## Использование
+
+```yaml
+- hosts: windows_workstation
+  gather_facts: yes
+  roles:
+    - role: vuln_windows
+      vars:
+        vuln_enabled:
+          - windows.auth.weak_admin_password
+          - windows.remote.rdp_enabled
+          - windows.firewall.disabled
+```
+
+## Переменные
+
+- `vuln_enabled` (list[str]): список включённых уязвимостей (ID).
+- `vuln_windows_weak_password` (string, default `password`): слабый пароль для демонстрации.
+- `vuln_windows_testadmin_user` (string, default `TestAdmin`): имя лишнего admin пользователя.
+
+## Доступные уязвимости (ID)
+
+- `windows.auth.lockout_disabled`
+- `windows.auth.weak_admin_password`
+- `windows.auth.no_password_policy`
+- `windows.auth.guest_enabled`
+- `windows.priv.testadmin_in_admins`
+- `windows.remote.rdp_enabled`
+- `windows.firewall.disabled`
+- `windows.updates.disabled`
+- `windows.defender.disabled` (best-effort)
+- `windows.network.smb1_enabled` (best-effort)
+- `windows.network.ntlmv1_enabled`
+- `windows.network.llmnr_enabled`
+- `windows.network.smb_signing_disabled`
+- `windows.services.remote_registry_enabled`
+- `windows.uac.disabled`
+- `windows.desktop.no_lock_on_idle`
+- `windows.power.sleep_disabled`
+- `windows.audit.disabled`
+
+## Добавление новой уязвимости
+
+1) Создайте файл `tasks/vulns/<id>.yml` (имя файла = ID).
+2) Добавьте ID в `defaults/main.yml` → `vuln_windows_known`.
+3) Включите ID в профиле `group_vars/.../vulnerabilities.yml`.
+

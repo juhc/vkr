@@ -3,7 +3,7 @@
 
 # Логика выбора:
 # - вы редактируете списки ID в `vuln_profiles.*`
-# - playbook передаёт нужный список в роль `vkr_vuln_windows` как `vuln_enabled`
+# - playbook передаёт нужный список в роль `vuln_windows` как `vuln_enabled`
 
 vuln_profiles:
   windows_workstation:
@@ -30,7 +30,7 @@ vuln_profiles:
     - windows.network.ntlmv1_enabled
     - windows.audit.disabled
 
-  # AD/DC-специфичные уязвимости (применяются ролью vkr_vuln_ad)
+  # AD/DC-специфичные уязвимости (применяются ролью vuln_ad)
   domain_controller_ad:
     - ad.priv.user_in_domain_admins
     - ad.auth.asrep_roastable_user

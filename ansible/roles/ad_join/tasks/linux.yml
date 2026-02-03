@@ -1,0 +1,80 @@
+---
+- name: Install AD join packages (Debian family)
+  ansible.builtin.apt:
+    name:
+      - realmd
+      - sssd
+      - sssd-tools
+      - adcli
+      - oddjob
+      - oddjob-mkhomedir
+      - samba-common-bin
+      - packagekit
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: Install AD join packages (RHEL family)
+  ansible.builtin.yum:
+    name:
+      - realmd
+      - sssd
+      - sssd-tools
+      - adcli
+      - oddjob
+      - oddjob-mkhomedir
+      - samba-common-tools
+      - krb5-workstation
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Configure DNS to point to DC (systemd-resolved)
+  ansible.builtin.copy:
+    dest: /etc/systemd/resolved.conf.d/ad-join.conf
+    content: |
+      [Resolve]
+      DNS={{ ad_dc_ip }}
+      Domains={{ ad_domain_name }}
+    mode: "0644"
+  when:
+    - ad_configure_dns | bool
+    - ansible_facts.services is defined
+  failed_when: false
+
+- name: Restart systemd-resolved if present
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted
+  when:
+    - ad_configure_dns | bool
+  failed_when: false
+
+- name: Ensure /etc/resolv.conf contains DC as nameserver (best-effort fallback)
+  ansible.builtin.lineinfile:
+    path: /etc/resolv.conf
+    line: "nameserver {{ ad_dc_ip }}"
+    insertbefore: BOF
+    state: present
+  when: ad_configure_dns | bool
+
+- name: Check if already joined (realm list)
+  ansible.builtin.command: realm list
+  register: ad_realm_list
+  changed_when: false
+  failed_when: false
+
+- name: Join domain (Linux) via realmd
+  ansible.builtin.shell: |
+    set -euo pipefail
+    printf '%s' "{{ ad_join_password }}" | realm join --user="{{ ad_join_user }}" "{{ ad_domain_name }}"
+  args:
+    executable: /bin/bash
+  when:
+    - ad_realm_list.stdout is not search(ad_domain_name)
+
+- name: Ensure sssd is enabled and running
+  ansible.builtin.service:
+    name: sssd
+    state: started
+    enabled: true
+  failed_when: false
+

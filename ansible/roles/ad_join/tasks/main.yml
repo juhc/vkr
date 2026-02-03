@@ -1,0 +1,28 @@
+---
+- name: Skip AD join when disabled
+  ansible.builtin.debug:
+    msg: "AD join disabled for this host (ad_join_enabled=false) — skipping."
+  when: not (ad_join_enabled | bool)
+
+- name: Stop role when AD join disabled
+  ansible.builtin.meta: end_host
+  when: not (ad_join_enabled | bool)
+
+- name: Validate required AD variables (when enabled)
+  ansible.builtin.assert:
+    that:
+      - ad_domain_name | length > 0
+      - ad_dc_ip | length > 0
+      - ad_join_user | length > 0
+      - ad_join_password | length > 0
+    fail_msg: >
+      AD join включен (ad_join_enabled=true), но не заданы переменные.
+      Заполните group_vars/all/ad.yml (см. ad.yml.example в стенде) и храните пароль безопасно (Vault/secret manager).
+
+- name: Join Windows to AD
+  ansible.builtin.import_tasks: windows.yml
+  when: ansible_os_family == "Windows"
+
+- name: Join Linux to AD
+  ansible.builtin.import_tasks: linux.yml
+  when: ansible_os_family != "Windows"

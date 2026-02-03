@@ -9,43 +9,47 @@
 # 2) Заполните значения под вашу сеть/домен.
 
 # Включать ли присоединение к домену для конкретных групп (ВМ).
-# Если false — роль vkr_ad_join будет пропущена, и креды join не требуются.
-vkr_ad_join_profiles:
+# Если false — роль ad_join будет пропущена, и креды join не требуются.
+ad_join_profiles:
   windows_workstation: true
   windows_server: true
   domain_controller: false
 
 # Организационная часть: OU/GPO scope для конкретного стенда
-vkr_ad_org_enabled: true
-vkr_ad_training_ou: "Training"
-vkr_ad_stand_id: "stand-win-01"
-vkr_ad_stand_ou: "Stand-Win-01"
+ad_org_enabled: true
+ad_training_ou: "Training"
+ad_stand_id: "stand-win-01"
+ad_stand_ou: "Stand-Win-01"
 
 # IMPORTANT: Это именно COMPUTERNAME в домене (как видит AD), а не alias из inventory.
 # Часто совпадает с hostname/именем ВМ, но проверьте на своих шаблонах.
-vkr_ad_stand_computers:
+ad_stand_computers:
   - "windows-10-training"
   - "windows-server-training"
 
 # FQDN домена AD (DNS-имя)
-vkr_ad_domain_name: "training.local"
+ad_domain_name: "training.local"
 
 # IP Domain Controller (DNS-сервер домена)
-vkr_ad_dc_ip: "192.168.101.30"
+ad_dc_ip: "192.168.101.30"
 
 # Учётка для присоединения машин к домену (должна иметь право join)
 # Рекомендуется доменная: "Administrator@training.local" или отдельный join-аккаунт.
-vkr_ad_join_user: "Administrator@training.local"
+ad_join_user: "Administrator@training.local"
 
 # Пароль join-аккаунта (vault!)
-vkr_ad_join_password: "PUT-AD-JOIN-PASSWORD-HERE"
+ad_join_password: "PUT-AD-JOIN-PASSWORD-HERE"
 
 # Настройка DNS на машинах перед join (важно для корректного поиска SRV записей домена)
-vkr_ad_configure_dns: true
+ad_configure_dns: true
+
+# Префикс для учебных GPO, создаваемых уязвимостями ad.gpo.*
+# Должен совпадать с тем, что использует роль ad_org для линковки/фильтрации.
+ad_gpo_prefix: "training-ad.gpo."
 
 # Дополнительно: доменные объекты (опционально, если выполняется на DC)
-vkr_ad_training_ou: "Training"
-vkr_ad_training_users:
+ad_training_ou: "Training"
+ad_training_users:
   - name: "student1"
     password: "StudentPass123!"
   - name: "student2"

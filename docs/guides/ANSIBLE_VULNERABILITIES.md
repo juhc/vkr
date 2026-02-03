@@ -5,8 +5,8 @@
 ## Как устроено
 
 - Переиспользуемые роли находятся в `ansible/roles/`:
-  - `vkr_vuln_linux` — уязвимости Linux
-  - `vkr_vuln_windows` — уязвимости Windows
+  - `vuln_linux` — уязвимости Linux
+  - `vuln_windows` — уязвимости Windows
 - В сценариях playbook’и тонкие: они только передают список `vuln_enabled` из `group_vars`.
 
 Каталог (ID → категория → проверка): `docs/guides/VULNERABILITY_CATALOG.md`.
@@ -14,7 +14,7 @@
 Админ-доступ (как заранее задать пароль/ключ): `docs/guides/ADMIN_ACCESS.md`.
 
 Пользователи/группы на стенде: используйте `accounts_profiles` в
-`stands/<scenario>/infrastructure/ansible/group_vars/all/accounts.yml` (см. `accounts.yml.example`) и роль `vkr_accounts`.
+`stands/<scenario>/infrastructure/ansible/group_vars/all/accounts.yml` (см. `accounts.yml.example`) и роль `accounts`.
 
 ## Где включать/выключать уязвимости
 
@@ -39,14 +39,14 @@
 
 ### Linux
 
-1) Создайте файл: `ansible/roles/vkr_vuln_linux/tasks/vulns/<id>.yml`
+1) Создайте файл: `ansible/roles/vuln_linux/tasks/vulns/<id>.yml`
 2) Добавьте `<id>` в:
-   - `ansible/roles/vkr_vuln_linux/defaults/main.yml` → `vkr_vuln_linux_known`
+   - `ansible/roles/vuln_linux/defaults/main.yml` → `vuln_linux_known`
 3) Добавьте ID в нужный профиль сценария (см. `group_vars/.../vulnerabilities.yml`).
 
 ### Windows
 
-Аналогично, но в роли `vkr_vuln_windows`.
+Аналогично, но в роли `vuln_windows`.
 
 ## Пример: включить слабые пароли и открыть удалённый доступ
 

@@ -3,7 +3,7 @@
 #
 # Логика выбора:
 # - вы редактируете списки ID в `vuln_profiles.*`
-# - playbook передаёт нужный список в роль `vkr_vuln_linux` как `vuln_enabled`
+# - playbook передаёт нужный список в роль `vuln_linux` как `vuln_enabled`
 
 vuln_profiles:
   linux_workstation:

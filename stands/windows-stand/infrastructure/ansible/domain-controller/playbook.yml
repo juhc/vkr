@@ -30,9 +30,9 @@
     
     - name: Настроить пользователей/группы (Domain Controller)
       ansible.builtin.import_role:
-        name: vkr_accounts
+        name: accounts
       vars:
-        vkr_accounts_users: "{{ ((accounts_profiles | default({})).domain_controller.users | default([])) }}"
+        accounts_users: "{{ ((accounts_profiles | default({})).domain_controller.users | default([])) }}"
 
     - name: Присоединение к домену не требуется (DC) — но создадим доменные объекты, если AD доступен
       ansible.windows.win_shell: |
@@ -41,22 +41,22 @@
           $domain = Get-ADDomain -ErrorAction Stop
           "OK: AD domain detected: $($domain.DNSRoot)"
         } catch {
-          "SKIP: ActiveDirectory module/domain not available. Ensure DC template is already a working DC for {{ vkr_ad_domain_name | default('training.local') }}."
+          "SKIP: ActiveDirectory module/domain not available. Ensure DC template is already a working DC for {{ ad_domain_name | default('training.local') }}."
         }
       changed_when: false
 
     - name: Применить профиль уязвимостей (Domain Controller, OS-level)
       ansible.builtin.import_role:
-        name: vkr_vuln_windows
+        name: vuln_windows
       vars:
         vuln_enabled: "{{ vuln_profiles.domain_controller | default([]) }}"
 
     - name: Применить профиль AD/DC уязвимостей (Domain Controller)
       ansible.builtin.import_role:
-        name: vkr_vuln_ad
+        name: vuln_ad
       vars:
         vuln_enabled: "{{ vuln_profiles.domain_controller_ad | default([]) }}"
 
     - name: Организационная часть AD (OU, security filtering, scope GPO) для стенда
       ansible.builtin.import_role:
-        name: vkr_ad_org
+        name: ad_org

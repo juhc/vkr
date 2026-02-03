@@ -58,7 +58,7 @@
 - Машина администратора должна иметь L3‑доступ до IP ВМ (SSH на 22/другие порты по политике курса).
 - Для домена:
   - Клиенты должны видеть **DC по сети**.
-  - DNS для клиентов должен указывать на **DC** (для join). В роли `vkr_ad_join` это настраивается автоматически, если `vkr_ad_configure_dns: true`.
+- DNS для клиентов должен указывать на **DC** (для join). В роли `ad_join` это настраивается автоматически, если `ad_configure_dns: true`.
 
 Если Linux‑стенд и Windows‑стенд в разных подсетях (например `192.168.102.0/24` и `192.168.101.0/24`), нужен маршрут между подсетями или размещение DC/клиентов в доступной топологии (в зависимости от вашей архитектуры).
 
@@ -95,8 +95,8 @@
 - DC функционирует как DNS для домена.
 
 Далее Ansible:
-- добавляет AD/GPO‑уязвимости (`vkr_vuln_ad`),
-- выполняет организационную автоматизацию (OU/группы/линковка и фильтрация GPO) (`vkr_ad_org`).
+- добавляет AD/GPO‑уязвимости (`vuln_ad`),
+- выполняет организационную автоматизацию (OU/группы/линковка и фильтрация GPO) (`ad_org`).
 
 ---
 
@@ -117,13 +117,13 @@
 - `group_vars/all/accounts.yml` (из `accounts.yml.example`) — какие пользователи/группы должны быть на ВМ.
 - `group_vars/all/vulnerabilities.yml` — какие уязвимости включены (`vuln_profiles.*`).
 - `group_vars/all/ad.yml` (из `ad.yml.example`) — параметры домена и включение/выключение domain join:
-  - `vkr_ad_domain_name`, `vkr_ad_dc_ip`
-  - `vkr_ad_join_user`, `vkr_ad_join_password` (хранить локально; **не коммитить**)
-  - `vkr_ad_join_profiles.*` (true/false)
+  - `ad_domain_name`, `ad_dc_ip`
+  - `ad_join_user`, `ad_join_password` (хранить локально; **не коммитить**)
+  - `ad_join_profiles.*` (true/false)
   - “организационная” часть для GPO:
-    - `vkr_ad_org_enabled`
-    - `vkr_ad_training_ou`, `vkr_ad_stand_ou`, `vkr_ad_stand_id`
-    - `vkr_ad_stand_computers` — **COMPUTERNAME** доменных хостов стенда
+    - `ad_org_enabled`
+    - `ad_training_ou`, `ad_stand_ou`, `ad_stand_id`
+    - `ad_stand_computers` — **COMPUTERNAME** доменных хостов стенда
 
 ---
 

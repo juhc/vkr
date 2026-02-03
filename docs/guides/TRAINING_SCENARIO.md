@@ -49,7 +49,7 @@
 
 3) **Включить/выключить присоединение к домену**:
    - `group_vars/all/ad.yml` (см. `ad.yml.example`)
-   - `vkr_ad_join_profiles.<group>: true|false`
+   - `ad_join_profiles.<group>: true|false`
 
 4) **Включить профили уязвимостей**:
    - `group_vars/all/vulnerabilities.yml`

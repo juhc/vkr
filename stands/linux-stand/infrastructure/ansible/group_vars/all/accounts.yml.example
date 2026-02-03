@@ -3,7 +3,7 @@
 #
 # Как использовать:
 # 1) Скопируйте в accounts.yml (локально/через vault) и отредактируйте
-# 2) Playbook возьмёт profiles и передаст в роль vkr_accounts
+# 2) Playbook возьмёт profiles и передаст в роль accounts
 #
 # Рекомендация: реальные пароли хранить через Ansible Vault.
 

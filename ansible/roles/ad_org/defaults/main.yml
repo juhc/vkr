@@ -1,0 +1,12 @@
+---
+ad_org_enabled: true
+
+ad_training_ou: "Training"
+ad_stand_ou: "Stand-01"
+ad_stand_id: "stand-01"
+
+# IMPORTANT: must match COMPUTERNAME in domain (not Ansible inventory host alias)
+ad_stand_computers: []
+
+ad_gpo_prefix: "training-ad.gpo."
+

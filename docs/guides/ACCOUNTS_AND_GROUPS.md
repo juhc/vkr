@@ -45,7 +45,7 @@ accounts_profiles:
 
 ## Как включается
 
-Playbook’и стендов уже вызывают роль `vkr_accounts` перед уязвимостями:
+Playbook’и стендов уже вызывают роль `accounts` перед уязвимостями:
 - Linux: `linux-ws/playbook.yml`, `linux-server/playbook.yml`
 - Windows: `windows-10/playbook.yml`, `windows-server/playbook.yml`, `domain-controller/playbook.yml`
 

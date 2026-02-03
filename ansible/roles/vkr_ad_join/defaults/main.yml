@@ -1,9 +1,0 @@
----
-vkr_ad_join_enabled: false
-
-vkr_ad_domain_name: ""
-vkr_ad_dc_ip: ""
-vkr_ad_join_user: ""
-vkr_ad_join_password: ""
-
-vkr_ad_configure_dns: true

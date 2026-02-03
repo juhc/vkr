@@ -10,12 +10,12 @@
 #      cp group_vars/all/ad.yml.example group_vars/all/ad.yml
 #      ansible-vault encrypt group_vars/all/ad.yml
 
-vkr_ad_join_profiles:
+ad_join_profiles:
   linux_workstation: true
   linux_server: true
 
-vkr_ad_domain_name: "training.local"
-vkr_ad_dc_ip: "192.168.101.30"
-vkr_ad_join_user: "Administrator@training.local"
-vkr_ad_join_password: "PUT-AD-JOIN-PASSWORD-HERE"
-vkr_ad_configure_dns: true
+ad_domain_name: "training.local"
+ad_dc_ip: "192.168.101.30"
+ad_join_user: "Administrator@training.local"
+ad_join_password: "PUT-AD-JOIN-PASSWORD-HERE"
+ad_configure_dns: true
