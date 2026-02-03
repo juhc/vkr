@@ -1,0 +1,10 @@
+- name: Weaken SSH rate-limiting parameters (high MaxAuthTries, long grace time)
+  ansible.builtin.blockinfile:
+    path: /etc/ssh/sshd_config
+    marker: "# {mark} VKR VULN"
+    block: |
+      MaxAuthTries 100
+      LoginGraceTime 120
+  create: yes
+  notify: Restart SSH
+

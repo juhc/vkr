@@ -6,7 +6,7 @@
 
 ## Доступные стенды
 
-### 1. Windows Стенд (`scenario-windows-stand`)
+### 1. Windows Стенд (`windows-stand`)
 
 **Описание:** Стенд для обучения защите операционных систем Windows
 
@@ -22,7 +22,7 @@
 
 **Структура:**
 ```
-scenario-windows-stand/
+windows-stand/
 ├── README.md
 ├── STRUCTURE.md
 └── infrastructure/
@@ -44,7 +44,7 @@ scenario-windows-stand/
 
 ---
 
-### 2. Linux Стенд (`scenario-linux-stand`)
+### 2. Linux Стенд (`linux-stand`)
 
 **Описание:** Стенд для обучения защите операционных систем Linux
 
@@ -58,7 +58,7 @@ scenario-windows-stand/
 
 **Структура:**
 ```
-scenario-linux-stand/
+linux-stand/
 ├── README.md
 ├── STRUCTURE.md
 └── infrastructure/
@@ -85,7 +85,7 @@ scenario-linux-stand/
 #### Развертывание рабочей станции Windows
 
 ```bash
-cd scenario-windows-stand/infrastructure/terraform/windows-10
+cd windows-stand/infrastructure/terraform/windows-10
 cp terraform.tfvars.example terraform.tfvars
 # Отредактируйте terraform.tfvars с вашими параметрами Proxmox
 terraform init
@@ -96,7 +96,7 @@ terraform apply
 #### Развертывание Windows Server
 
 ```bash
-cd scenario-windows-stand/infrastructure/terraform/windows-server
+cd windows-stand/infrastructure/terraform/windows-server
 cp terraform.tfvars.example terraform.tfvars
 # Отредактируйте terraform.tfvars
 terraform init
@@ -107,7 +107,7 @@ terraform apply
 #### Развертывание Domain Controller
 
 ```bash
-cd scenario-windows-stand/infrastructure/terraform/domain-controller
+cd windows-stand/infrastructure/terraform/domain-controller
 cp terraform.tfvars.example terraform.tfvars
 # Отредактируйте terraform.tfvars
 terraform init
@@ -118,7 +118,7 @@ terraform apply
 #### Автоматическое развертывание всего стенда
 
 ```bash
-cd scenario-windows-stand/infrastructure/scripts
+cd windows-stand/infrastructure/scripts
 chmod +x deploy.sh
 ./deploy.sh
 ```
@@ -130,7 +130,7 @@ chmod +x deploy.sh
 #### Развертывание рабочей станции Linux
 
 ```bash
-cd scenario-linux-stand/infrastructure/terraform/linux-ws
+cd linux-stand/infrastructure/terraform/linux-ws
 cp terraform.tfvars.example terraform.tfvars
 # Отредактируйте terraform.tfvars с вашими параметрами Proxmox
 terraform init
@@ -141,7 +141,7 @@ terraform apply
 #### Развертывание Linux сервера
 
 ```bash
-cd scenario-linux-stand/infrastructure/terraform/linux-server
+cd linux-stand/infrastructure/terraform/linux-server
 cp terraform.tfvars.example terraform.tfvars
 # Отредактируйте terraform.tfvars
 terraform init
@@ -152,7 +152,7 @@ terraform apply
 #### Автоматическое развертывание всего стенда
 
 ```bash
-cd scenario-linux-stand/infrastructure/scripts
+cd linux-stand/infrastructure/scripts
 chmod +x deploy.sh
 ./deploy.sh
 ```
@@ -279,7 +279,7 @@ chmod +x deploy.sh
 ### Развертывание одной машины
 
 ```bash
-cd scenario-windows-stand/infrastructure/terraform/windows-ws
+cd windows-stand/infrastructure/terraform/windows-10
 terraform init
 terraform apply
 ```
@@ -287,14 +287,14 @@ terraform apply
 ### Развертывание всего стенда
 
 ```bash
-cd scenario-windows-stand/infrastructure/scripts
+cd windows-stand/infrastructure/scripts
 ./deploy.sh
 ```
 
 ### Настройка уязвимостей
 
 ```bash
-cd scenario-windows-stand/infrastructure/ansible
+cd windows-stand/infrastructure/ansible
 ansible-playbook -i inventory.yml windows-10/playbook.yml
 ```
 
@@ -304,10 +304,10 @@ ansible-playbook -i inventory.yml windows-10/playbook.yml
 
 Каждый стенд содержит свою документацию:
 
-- **scenario-windows-stand/README.md** - описание Windows стенда
-- **scenario-windows-stand/STRUCTURE.md** - структура проекта
-- **scenario-linux-stand/README.md** - описание Linux стенда
-- **scenario-linux-stand/STRUCTURE.md** - структура проекта
+- **windows-stand/README.md** - описание Windows стенда
+- **windows-stand/STRUCTURE.md** - структура проекта
+- **linux-stand/README.md** - описание Linux стенда
+- **linux-stand/STRUCTURE.md** - структура проекта
 
 ---
 

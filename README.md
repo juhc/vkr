@@ -8,8 +8,8 @@
 
 В репозитории сейчас есть два стенда:
 
-- `stands/scenario-windows-stand` — Windows WS / Windows Server / Domain Controller
-- `stands/scenario-linux-stand` — Linux WS / Linux Server
+- `stands/windows-stand` — Windows WS / Windows Server / Domain Controller
+- `stands/linux-stand` — Linux WS / Linux Server
 
 Быстрый вход: `stands/README.md`.
 
@@ -59,16 +59,16 @@ vkr/
 ├── ansible/                     # Ansible роли
 │   └── roles/                   # Роли для настройки серверов
 └── stands/                      # Учебные стенды
-    ├── scenario-windows-stand/  # Windows стенд (WS/Server/DC)
-    └── scenario-linux-stand/    # Linux стенд (WS/Server)
+    ├── windows-stand/           # Windows стенд (WS/Server/DC)
+    └── linux-stand/             # Linux стенд (WS/Server)
 ```
 
 ---
 
 ## 🎯 Доступные стенды
 
-- **Windows стенд**: `stands/scenario-windows-stand/README.md`
-- **Linux стенд**: `stands/scenario-linux-stand/README.md`
+- **Windows стенд**: `stands/windows-stand/README.md`
+- **Linux стенд**: `stands/linux-stand/README.md`
 
 ---
 

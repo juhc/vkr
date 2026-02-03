@@ -24,6 +24,7 @@
 
 ## Доступные уязвимости (ID)
 
+- `windows.auth.lockout_disabled`
 - `windows.auth.weak_admin_password`
 - `windows.auth.no_password_policy`
 - `windows.auth.guest_enabled`
@@ -34,6 +35,12 @@
 - `windows.defender.disabled` (best-effort)
 - `windows.network.smb1_enabled` (best-effort)
 - `windows.network.ntlmv1_enabled`
+- `windows.network.llmnr_enabled`
+- `windows.network.smb_signing_disabled`
+- `windows.services.remote_registry_enabled`
+- `windows.uac.disabled`
+- `windows.desktop.no_lock_on_idle`
+- `windows.power.sleep_disabled`
 - `windows.audit.disabled`
 
 ## Добавление новой уязвимости

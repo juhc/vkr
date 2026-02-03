@@ -1,0 +1,20 @@
+---
+- name: Ensure ActiveDirectory module is available (best-effort)
+  ansible.windows.win_shell: |
+    try { Import-Module ActiveDirectory -ErrorAction Stop; "OK" } catch { "NOAD" }
+  register: vkr_ad_module
+  changed_when: false
+
+- name: Create AS-REP roastable user (DONT_REQ_PREAUTH) (best-effort)
+  ansible.windows.win_shell: |
+    Import-Module ActiveDirectory
+    $u = "{{ vkr_vuln_ad_test_user }}_asrep"
+    $pwd = ConvertTo-SecureString "{{ vkr_vuln_ad_weak_password }}" -AsPlainText -Force
+    if (-not (Get-ADUser -Filter "SamAccountName -eq '$u'" -ErrorAction SilentlyContinue)) {
+      New-ADUser -Name $u -SamAccountName $u -Enabled $true -AccountPassword $pwd -PasswordNeverExpires $true
+    }
+    Set-ADAccountControl -Identity $u -DoesNotRequirePreAuth $true
+    "OK"
+  when: vkr_ad_module.stdout is search("OK")
+  failed_when: false
+

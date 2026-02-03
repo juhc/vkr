@@ -28,7 +28,7 @@
 
 ## Как переиспользовать в новом сценарии
 
-1) Скопируйте структуру `stands/scenario-*-stand/infrastructure/ansible`.
+1) Скопируйте структуру `stands/*-stand/infrastructure/ansible`.
 2) Оставьте playbook’и как есть (они уже используют роли из `ansible/roles/`).
 3) Заполните `inventory.yml`.
 4) Настройте профили в `group_vars/all/vulnerabilities.yml`.

@@ -1,0 +1,7 @@
+- name: Enable LLMNR (EnableMulticast=1) (policy-level)
+  ansible.windows.win_regedit:
+    path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient
+    name: EnableMulticast
+    data: 1
+    type: dword
+

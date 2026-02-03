@@ -1,0 +1,9 @@
+---
+- name: Disable LDAP signing requirement (best-effort)
+  ansible.windows.win_regedit:
+    path: HKLM:\SYSTEM\CurrentControlSet\Services\NTDS\Parameters
+    name: LDAPServerIntegrity
+    data: 0
+    type: dword
+  failed_when: false
+

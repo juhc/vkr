@@ -1,0 +1,7 @@
+- name: Disable account lockout policy (net accounts)
+  ansible.windows.win_shell: |
+    net accounts /lockoutthreshold:0
+    net accounts /lockoutduration:0
+    net accounts /lockoutwindow:0
+  changed_when: false
+

@@ -1,0 +1,32 @@
+---
+# Ansible playbook для настройки уязвимостей на рабочей станции Linux (Desktop)
+# Поддерживаемые дистрибутивы: Ubuntu Desktop, Debian Desktop
+
+- name: Настройка уязвимостей на рабочей станции Linux
+  hosts: linux_workstation
+  gather_facts: yes
+  become: yes
+  
+  tasks:
+    - name: Вывод информации о дистрибутиве
+      ansible.builtin.debug:
+        msg: "Обнаружен дистрибутив: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+    - name: Настроить пользователей/группы (Linux WS)
+      ansible.builtin.import_role:
+        name: vkr_accounts
+      vars:
+        vkr_accounts_groups: "{{ ((accounts_profiles | default({})).linux_workstation.groups | default([])) }}"
+        vkr_accounts_users:  "{{ ((accounts_profiles | default({})).linux_workstation.users  | default([])) }}"
+
+    - name: Присоединить Linux WS к домену AD
+      ansible.builtin.import_role:
+        name: vkr_ad_join
+      vars:
+        vkr_ad_join_enabled: "{{ (vkr_ad_join_profiles.linux_workstation | default(false)) | bool }}"
+
+    - name: Применить профиль уязвимостей (Linux WS)
+      ansible.builtin.import_role:
+        name: vkr_vuln_linux
+      vars:
+        vuln_enabled: "{{ vuln_profiles.linux_workstation | default([]) }}"

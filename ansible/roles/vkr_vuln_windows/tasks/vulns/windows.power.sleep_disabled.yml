@@ -1,0 +1,8 @@
+- name: Disable sleep/hibernate timeouts (Never) (best-effort)
+  ansible.windows.win_shell: |
+    powercfg /change standby-timeout-ac 0
+    powercfg /change standby-timeout-dc 0
+    powercfg /change hibernate-timeout-ac 0
+    powercfg /change hibernate-timeout-dc 0
+  changed_when: false
+

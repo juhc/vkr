@@ -1,0 +1,31 @@
+- name: Disable fail2ban (if present) - reduces brute-force protection
+  ansible.builtin.service:
+    name: fail2ban
+    state: stopped
+    enabled: false
+  failed_when: false
+
+- name: Remove pam_faillock from RHEL-family PAM (password-auth) (best-effort)
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/password-auth
+    regexp: '^\s*auth\s+.*pam_faillock\.so.*$'
+    state: absent
+  when: ansible_os_family == "RedHat"
+  failed_when: false
+
+- name: Remove pam_faillock from RHEL-family PAM (system-auth) (best-effort)
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/system-auth
+    regexp: '^\s*auth\s+.*pam_faillock\.so.*$'
+    state: absent
+  when: ansible_os_family == "RedHat"
+  failed_when: false
+
+- name: Remove pam_tally2/faillock from Debian-family PAM (common-auth) (best-effort)
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/common-auth
+    regexp: '^\s*auth\s+.*pam_(tally2|faillock)\.so.*$'
+    state: absent
+  when: ansible_os_family == "Debian"
+  failed_when: false
+

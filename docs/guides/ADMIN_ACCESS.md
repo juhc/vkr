@@ -12,7 +12,7 @@ Linux VM создаются из cloud-init template, поэтому учётк�
 - `cipassword` — пароль (опционально), чтобы можно было войти в консоль без SSH
 
 Где настраивать:
-- `stands/scenario-linux-stand/infrastructure/terraform/*/terraform.tfvars` (локальный файл, не коммитится)
+- `stands/linux-stand/infrastructure/terraform/*/terraform.tfvars` (локальный файл, не коммитится)
 
 Пример (в `terraform.tfvars`):
 
@@ -35,7 +35,7 @@ Windows VM клонируются из Packer template. В template должен
 - если задан `admin_ssh_public_key` — добавляет ключ в `authorized_keys`
 
 Где настраивать:
-- `stands/scenario-windows-stand/infrastructure/terraform/*/terraform.tfvars` (локальный файл, не коммитится)
+- `stands/windows-stand/infrastructure/terraform/*/terraform.tfvars` (локальный файл, не коммитится)
 
 Пример:
 

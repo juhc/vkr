@@ -1,0 +1,29 @@
+---
+- name: Disable Windows Firewall via GPO (OU Training) (best-effort)
+  ansible.windows.win_shell: |
+    $gpoName = "VKR-ad.gpo.firewall_disabled"
+    $ouName = "{{ vkr_ad_training_ou | default('Training') }}"
+    try {
+      Import-Module ActiveDirectory -ErrorAction Stop
+      Import-Module GroupPolicy -ErrorAction Stop
+      $dn = (Get-ADDomain).DistinguishedName
+      $ouDn = "OU=$ouName,$dn"
+      if (-not (Get-ADOrganizationalUnit -LDAPFilter "(distinguishedName=$ouDn)" -ErrorAction SilentlyContinue)) {
+        New-ADOrganizationalUnit -Name $ouName -Path $dn -ProtectedFromAccidentalDeletion $false | Out-Null
+      }
+      if (-not (Get-GPO -Name $gpoName -ErrorAction SilentlyContinue)) {
+        New-GPO -Name $gpoName | Out-Null
+      }
+      try { New-GPLink -Name $gpoName -Target $ouDn -LinkEnabled Yes -ErrorAction Stop | Out-Null } catch {}
+
+      $profiles = @("DomainProfile","PrivateProfile","PublicProfile")
+      foreach ($p in $profiles) {
+        Set-GPRegistryValue -Name $gpoName -Key "HKLM\SOFTWARE\Policies\Microsoft\WindowsFirewall\$p" -ValueName "EnableFirewall" -Type DWord -Value 0
+      }
+      "OK"
+    } catch {
+      "SKIP/ERR"
+    }
+  changed_when: false
+  failed_when: false
+

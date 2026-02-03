@@ -1,0 +1,80 @@
+---
+- name: Install AD join packages (Debian family)
+  ansible.builtin.apt:
+    name:
+      - realmd
+      - sssd
+      - sssd-tools
+      - adcli
+      - oddjob
+      - oddjob-mkhomedir
+      - samba-common-bin
+      - packagekit
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: Install AD join packages (RHEL family)
+  ansible.builtin.yum:
+    name:
+      - realmd
+      - sssd
+      - sssd-tools
+      - adcli
+      - oddjob
+      - oddjob-mkhomedir
+      - samba-common-tools
+      - krb5-workstation
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Configure DNS to point to DC (systemd-resolved)
+  ansible.builtin.copy:
+    dest: /etc/systemd/resolved.conf.d/vkr-ad.conf
+    content: |
+      [Resolve]
+      DNS={{ vkr_ad_dc_ip }}
+      Domains={{ vkr_ad_domain_name }}
+    mode: "0644"
+  when:
+    - vkr_ad_configure_dns | bool
+    - ansible_facts.services is defined
+  failed_when: false
+
+- name: Restart systemd-resolved if present
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted
+  when:
+    - vkr_ad_configure_dns | bool
+  failed_when: false
+
+- name: Ensure /etc/resolv.conf contains DC as nameserver (best-effort fallback)
+  ansible.builtin.lineinfile:
+    path: /etc/resolv.conf
+    line: "nameserver {{ vkr_ad_dc_ip }}"
+    insertbefore: BOF
+    state: present
+  when: vkr_ad_configure_dns | bool
+
+- name: Check if already joined (realm list)
+  ansible.builtin.command: realm list
+  register: vkr_realm_list
+  changed_when: false
+  failed_when: false
+
+- name: Join domain (Linux) via realmd
+  ansible.builtin.shell: |
+    set -euo pipefail
+    printf '%s' "{{ vkr_ad_join_password }}" | realm join --user="{{ vkr_ad_join_user }}" "{{ vkr_ad_domain_name }}"
+  args:
+    executable: /bin/bash
+  when:
+    - vkr_realm_list.stdout is not search(vkr_ad_domain_name)
+
+- name: Ensure sssd is enabled and running
+  ansible.builtin.service:
+    name: sssd
+    state: started
+    enabled: true
+  failed_when: false
+

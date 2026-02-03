@@ -1,0 +1,25 @@
+vuln_enabled: []
+
+vkr_vuln_ad_domain_name: "training.local"
+vkr_vuln_ad_weak_password: "password"
+vkr_vuln_ad_test_user: "StudentTest"
+
+vkr_vuln_ad_known:
+  - ad.priv.user_in_domain_admins
+  - ad.auth.asrep_roastable_user
+  - ad.network.ldap_signing_disabled
+  - ad.gpo.password_policy_weak
+  - ad.gpo.account_lockout_disabled
+  - ad.gpo.llmnr_enabled
+  - ad.gpo.smb_signing_disabled
+  - ad.gpo.ntlmv1_allowed
+  - ad.gpo.firewall_disabled
+  - ad.gpo.defender_disabled
+  - ad.gpo.updates_disabled
+  - ad.gpo.powershell_logging_disabled
+  - ad.gpo.audit_disabled
+  - ad.gpo.eventlog_retention_low
+  - ad.gpo.rdp_open_to_all
+  - ad.gpo.winrm_insecure
+  - ad.gpo.no_lock_on_idle
+

@@ -7,7 +7,7 @@ stands/
 ├── README.md                    # Главный README с описанием всех стендов
 ├── PROJECT_STRUCTURE.md          # Этот файл - описание структуры проекта
 │
-├── scenario-windows-stand/      # Windows Стенд
+├── windows-stand/               # Windows Стенд
 │   ├── README.md
 │   ├── STRUCTURE.md
 │   └── infrastructure/
@@ -24,7 +24,7 @@ stands/
 │       └── scripts/
 │           └── deploy.sh
 │
-└── scenario-linux-stand/        # Linux Стенд
+└── linux-stand/                 # Linux Стенд
     ├── README.md
     ├── STRUCTURE.md
     └── infrastructure/
@@ -47,8 +47,8 @@ stands/
 ### 1. Разделение по стендам
 
 Каждый стенд находится в отдельной директории:
-- **scenario-windows-stand/** - все, что связано с Windows
-- **scenario-linux-stand/** - все, что связано с Linux
+- **windows-stand/** - все, что связано с Windows
+- **linux-stand/** - все, что связано с Linux
 
 ### 2. Раздельные конфигурации для каждой машины
 
@@ -145,7 +145,7 @@ stands/
 ### Развертывание одной машины
 
 ```bash
-cd scenario-windows-stand/infrastructure/terraform/windows-ws
+cd windows-stand/infrastructure/terraform/windows-10
 terraform init
 terraform apply
 ```
@@ -153,14 +153,14 @@ terraform apply
 ### Развертывание всего стенда
 
 ```bash
-cd scenario-windows-stand/infrastructure/scripts
+cd windows-stand/infrastructure/scripts
 ./deploy.sh
 ```
 
 ### Настройка уязвимостей
 
 ```bash
-cd scenario-windows-stand/infrastructure/ansible
+cd windows-stand/infrastructure/ansible
 ansible-playbook -i inventory.yml windows-10/playbook.yml
 ```
 
@@ -178,7 +178,7 @@ ansible-playbook -i inventory.yml windows-10/playbook.yml
 
 ### Добавление нового стенда
 
-1. Создайте директорию `scenario-<name>-stand/`
+1. Создайте директорию `<name>-stand/`
 2. Скопируйте структуру из существующего стенда
 3. Измените IP адреса на новую сеть
 4. Обновите главный `README.md`

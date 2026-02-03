@@ -39,7 +39,7 @@ git checkout main
 git checkout scenario-isp-company
 
 # Перейти в директорию сценария
-cd stands/scenario-windows-stand
+cd stands/windows-stand
 
 # Просмотреть структуру
 ls -la
@@ -48,7 +48,7 @@ ls -la
 #### Структура файлов
 
 ```
-stands/scenario-windows-stand/
+stands/windows-stand/
 ├── README.md              # Описание сценария
 ├── QUICKSTART.md          # Быстрый старт
 ├── DEPLOYMENT.md          # Инструкции по развертыванию
@@ -65,14 +65,14 @@ git checkout scenario-isp-company
 
 # 2. Внесите изменения в файлы
 # Например, отредактируйте README.md
-nano stands/scenario-windows-stand/README.md
+nano stands/windows-stand/README.md
 
 # 3. Проверьте изменения
 git status
 git diff
 
 # 4. Добавьте изменения
-git add stands/scenario-windows-stand/README.md
+git add stands/windows-stand/README.md
 
 # 5. Закоммитьте
 git commit -m "Обновлен README для ISP сценария"
@@ -90,7 +90,7 @@ git push origin scenario-isp-company
 git checkout scenario-office-organization
 
 # Перейти в директорию сценария
-cd stands/scenario-linux-stand
+cd stands/linux-stand
 
 # Просмотреть структуру
 ls -la
@@ -99,7 +99,7 @@ ls -la
 #### Структура файлов
 
 ```
-stands/scenario-linux-stand/
+stands/linux-stand/
 ├── README.md
 ├── QUICKSTART.md
 ├── DEPLOYMENT.md
@@ -128,14 +128,14 @@ git checkout scenario-office-organization
 
 # 2. Внесите изменения
 # Например, измените Terraform конфигурацию
-nano stands/scenario-linux-stand/infrastructure/terraform/linux-server/main.tf
+nano stands/linux-stand/infrastructure/terraform/linux-server/main.tf
 
 # 3. Проверьте изменения
 git status
 git diff
 
 # 4. Добавьте и закоммитьте
-git add stands/scenario-linux-stand/infrastructure/terraform/linux-server/main.tf
+git add stands/linux-stand/infrastructure/terraform/linux-server/main.tf
 git commit -m "Обновлена Terraform конфигурация"
 
 # 5. Опубликуйте
@@ -210,10 +210,10 @@ git push origin scenario-office-organization
 git checkout scenario-isp-company
 
 # 2. Создайте новый файл
-nano stands/scenario-windows-stand/NEW_FILE.md
+nano stands/windows-stand/NEW_FILE.md
 
 # 3. Добавьте и закоммитьте
-git add stands/scenario-windows-stand/NEW_FILE.md
+git add stands/windows-stand/NEW_FILE.md
 git commit -m "Добавлен новый файл в ISP сценарий"
 
 # 4. Опубликуйте
@@ -227,13 +227,13 @@ git push origin scenario-isp-company
 git checkout scenario-office-organization
 
 # 2. Отредактируйте файл
-nano stands/scenario-linux-stand/README.md
+nano stands/linux-stand/README.md
 
 # 3. Проверьте изменения
-git diff stands/scenario-linux-stand/README.md
+git diff stands/linux-stand/README.md
 
 # 4. Закоммитьте
-git add stands/scenario-linux-stand/README.md
+git add stands/linux-stand/README.md
 git commit -m "Обновлена документация офисного сценария"
 
 # 5. Опубликуйте
@@ -247,16 +247,16 @@ git push origin scenario-office-organization
 git checkout scenario-office-organization
 
 # 2. Измените конфигурацию
-nano stands/scenario-linux-stand/infrastructure/terraform/linux-server/main.tf
+nano stands/linux-stand/infrastructure/terraform/linux-server/main.tf
 
 # 3. Проверьте синтаксис (если установлен terraform)
-cd stands/scenario-linux-stand/infrastructure/terraform/linux-server
+cd stands/linux-stand/infrastructure/terraform/linux-server
 terraform fmt
 terraform validate
 
 # 4. Вернитесь в корень и закоммитьте
 cd ../../../../..
-git add stands/scenario-linux-stand/infrastructure/terraform/
+git add stands/linux-stand/infrastructure/terraform/
 git commit -m "Обновлена Terraform конфигурация"
 
 # 5. Опубликуйте
@@ -270,13 +270,13 @@ git push origin scenario-office-organization
 git checkout scenario-office-organization
 
 # 2. Измените плейбук
-nano stands/scenario-linux-stand/infrastructure/ansible/linux-server/playbook.yml
+nano stands/linux-stand/infrastructure/ansible/linux-server/playbook.yml
 
 # 3. Проверьте синтаксис (если установлен ansible-lint)
-ansible-lint stands/scenario-linux-stand/infrastructure/ansible/linux-server/playbook.yml
+ansible-lint stands/linux-stand/infrastructure/ansible/linux-server/playbook.yml
 
 # 4. Закоммитьте
-git add stands/scenario-linux-stand/infrastructure/ansible/
+git add stands/linux-stand/infrastructure/ansible/
 git commit -m "Обновлен Ansible плейбук"
 
 # 5. Опубликуйте
@@ -331,13 +331,13 @@ git commit -m "Разрешен конфликт при слиянии с main"
 git log --oneline
 
 # История конкретного файла
-git log --oneline stands/scenario-windows-stand/README.md
+git log --oneline stands/windows-stand/README.md
 
 # Графическое представление всех веток
 git log --oneline --graph --all
 
 # Показать изменения в файле
-git diff HEAD stands/scenario-windows-stand/README.md
+git diff HEAD stands/windows-stand/README.md
 ```
 
 ### Отмена изменений
@@ -434,7 +434,7 @@ git push --all origin
 
 1. **Не коммитьте в неправильную ветку** - всегда проверяйте текущую ветку
 2. **Не игнорируйте конфликты** - разрешайте их сразу
-3. **Не коммитьте чувствительные данные** - используйте Ansible Vault
+3. **Не коммитьте чувствительные данные**: храните их локально/в менеджере секретов (Ansible Vault — опционально)
 4. **Не забывайте синхронизировать** - регулярно мержите изменения из main
 5. **Не публикуйте без проверки** - тестируйте изменения перед push
 
@@ -447,11 +447,11 @@ git push --all origin
 git checkout scenario-isp-company
 
 # 2. Обновите документацию
-nano stands/scenario-windows-stand/machine-scenarios.md
+nano stands/windows-stand/machine-scenarios.md
 # Добавьте описание новой машины
 
 # 3. Обновите сетевую топологию
-nano stands/scenario-windows-stand/network-topology.md
+nano stands/windows-stand/network-topology.md
 # Добавьте новую машину в топологию
 
 # 4. Проверьте изменения
@@ -459,7 +459,7 @@ git status
 git diff
 
 # 5. Закоммитьте
-git add stands/scenario-windows-stand/
+git add stands/windows-stand/
 git commit -m "Добавлена новая машина в ISP сценарий"
 
 # 6. Опубликуйте

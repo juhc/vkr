@@ -1,0 +1,8 @@
+- name: Add world-writable directory to PATH system-wide (insecure)
+  ansible.builtin.copy:
+    dest: /etc/profile.d/vkr-unsafe-path.sh
+    mode: "0644"
+    content: |
+      # VKR VULN: insecure PATH (world-writable directory first)
+      export PATH="/tmp:$PATH"
+

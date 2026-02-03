@@ -1,0 +1,72 @@
+---
+- name: Skip AD org automation when disabled
+  ansible.builtin.debug:
+    msg: "AD org automation disabled (vkr_ad_org_enabled=false) — skipping."
+  when: not (vkr_ad_org_enabled | bool)
+
+- name: Stop role when AD org automation disabled
+  ansible.builtin.meta: end_host
+  when: not (vkr_ad_org_enabled | bool)
+
+- name: AD org automation (OU, group, move computers, link/filter GPO) (best-effort)
+  ansible.windows.win_shell: |
+    $trainingOu = "{{ vkr_ad_training_ou }}"
+    $standOu = "{{ vkr_ad_stand_ou }}"
+    $standId = "{{ vkr_ad_stand_id }}"
+    $gpoPrefix = "{{ vkr_ad_gpo_prefix }}"
+    $computers = @({{ vkr_ad_stand_computers | to_json }})
+
+    try {
+      Import-Module ActiveDirectory -ErrorAction Stop
+      Import-Module GroupPolicy -ErrorAction Stop
+
+      $dn = (Get-ADDomain).DistinguishedName
+      $trainingOuDn = "OU=$trainingOu,$dn"
+      $standOuDn = "OU=$standOu,OU=$trainingOu,$dn"
+
+      # Ensure OUs
+      if (-not (Get-ADOrganizationalUnit -LDAPFilter "(distinguishedName=$trainingOuDn)" -ErrorAction SilentlyContinue)) {
+        New-ADOrganizationalUnit -Name $trainingOu -Path $dn -ProtectedFromAccidentalDeletion $false | Out-Null
+      }
+      if (-not (Get-ADOrganizationalUnit -LDAPFilter "(distinguishedName=$standOuDn)" -ErrorAction SilentlyContinue)) {
+        New-ADOrganizationalUnit -Name $standOu -Path $trainingOuDn -ProtectedFromAccidentalDeletion $false | Out-Null
+      }
+
+      # Ensure group for stand computers
+      $groupName = "GG-$standId-Computers"
+      if (-not (Get-ADGroup -Identity $groupName -ErrorAction SilentlyContinue)) {
+        New-ADGroup -Name $groupName -SamAccountName $groupName -GroupScope Global -GroupCategory Security -Path $standOuDn | Out-Null
+      }
+
+      # Move computers + add to group
+      foreach ($c in $computers) {
+        if (-not $c) { continue }
+        $obj = $null
+        try { $obj = Get-ADComputer -Identity $c -ErrorAction Stop } catch {}
+        if (-not $obj) {
+          $obj = Get-ADComputer -Filter "Name -eq '$c'" -ErrorAction SilentlyContinue
+        }
+        if ($obj) {
+          try { Move-ADObject -Identity $obj.DistinguishedName -TargetPath $standOuDn -ErrorAction Stop | Out-Null } catch {}
+          try { Add-ADGroupMember -Identity $groupName -Members $obj -ErrorAction Stop | Out-Null } catch {}
+        }
+      }
+
+      # Link and filter all VKR GPOs to stand OU
+      $gpos = Get-GPO -All | Where-Object { $_.DisplayName -like "$gpoPrefix*" }
+      foreach ($g in $gpos) {
+        try { Remove-GPLink -Name $g.DisplayName -Target $trainingOuDn -Confirm:$false -ErrorAction SilentlyContinue | Out-Null } catch {}
+        try { New-GPLink -Name $g.DisplayName -Target $standOuDn -LinkEnabled Yes -ErrorAction SilentlyContinue | Out-Null } catch {}
+
+        # Security filtering: Authenticated Users -> read only, stand group -> apply
+        try { Set-GPPermissions -Name $g.DisplayName -TargetName "Authenticated Users" -TargetType Group -PermissionLevel GpoRead -ErrorAction SilentlyContinue | Out-Null } catch {}
+        try { Set-GPPermissions -Name $g.DisplayName -TargetName $groupName -TargetType Group -PermissionLevel GpoApply -ErrorAction SilentlyContinue | Out-Null } catch {}
+      }
+
+      "OK"
+    } catch {
+      "SKIP/ERR"
+    }
+  changed_when: false
+  failed_when: false
+

@@ -1,0 +1,21 @@
+---
+# Active Directory (обязательный компонент обучения).
+#
+# Важно:
+# - Linux машины должны видеть DC по сети (через VPN/маршрутизацию) и использовать DC как DNS.
+# - Если Linux-стенд в другой подсети, убедитесь, что есть маршрут до DC и открыты порты AD/DNS.
+#
+# Как использовать:
+# 1) Скопируйте в ad.yml (и храните пароль через Ansible Vault):
+#      cp group_vars/all/ad.yml.example group_vars/all/ad.yml
+#      ansible-vault encrypt group_vars/all/ad.yml
+
+vkr_ad_join_profiles:
+  linux_workstation: true
+  linux_server: true
+
+vkr_ad_domain_name: "training.local"
+vkr_ad_dc_ip: "192.168.101.30"
+vkr_ad_join_user: "Administrator@training.local"
+vkr_ad_join_password: "PUT-AD-JOIN-PASSWORD-HERE"
+vkr_ad_configure_dns: true

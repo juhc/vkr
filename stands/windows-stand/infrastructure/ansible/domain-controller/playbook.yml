@@ -1,0 +1,62 @@
+---
+# Ansible playbook для настройки уязвимостей на Domain Controller
+# Поддерживаемые версии: Windows Server 2016, 2019, 2022 с ролью AD DS
+
+- name: Настройка уязвимостей на Domain Controller
+  hosts: domain_controller
+  gather_facts: yes
+  
+  tasks:
+    - name: Проверка версии Windows Server
+      win_shell: |
+        (Get-WmiObject Win32_OperatingSystem).Caption
+      register: windows_version
+      changed_when: false
+    
+    - name: Вывод версии Windows Server
+      debug:
+        msg: "Обнаружена ОС: {{ windows_version.stdout }}"
+    
+    - name: Проверка роли AD DS
+      win_shell: |
+        Get-WindowsFeature -Name AD-Domain-Services | Select-Object -ExpandProperty InstallState
+      register: ad_ds_status
+      changed_when: false
+      failed_when: false
+    
+    - name: Вывод статуса AD DS
+      debug:
+        msg: "Статус AD DS: {{ ad_ds_status.stdout }}"
+    
+    - name: Настроить пользователей/группы (Domain Controller)
+      ansible.builtin.import_role:
+        name: vkr_accounts
+      vars:
+        vkr_accounts_users: "{{ ((accounts_profiles | default({})).domain_controller.users | default([])) }}"
+
+    - name: Присоединение к домену не требуется (DC) — но создадим доменные объекты, если AD доступен
+      ansible.windows.win_shell: |
+        try {
+          Import-Module ActiveDirectory -ErrorAction Stop
+          $domain = Get-ADDomain -ErrorAction Stop
+          "OK: AD domain detected: $($domain.DNSRoot)"
+        } catch {
+          "SKIP: ActiveDirectory module/domain not available. Ensure DC template is already a working DC for {{ vkr_ad_domain_name | default('training.local') }}."
+        }
+      changed_when: false
+
+    - name: Применить профиль уязвимостей (Domain Controller, OS-level)
+      ansible.builtin.import_role:
+        name: vkr_vuln_windows
+      vars:
+        vuln_enabled: "{{ vuln_profiles.domain_controller | default([]) }}"
+
+    - name: Применить профиль AD/DC уязвимостей (Domain Controller)
+      ansible.builtin.import_role:
+        name: vkr_vuln_ad
+      vars:
+        vuln_enabled: "{{ vuln_profiles.domain_controller_ad | default([]) }}"
+
+    - name: Организационная часть AD (OU, security filtering, scope GPO) для стенда
+      ansible.builtin.import_role:
+        name: vkr_ad_org

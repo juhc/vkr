@@ -58,16 +58,16 @@
 2. **Ознакомьтесь со структурой сценариев**: [Структура сценариев](structure/scenarios-structure.md)
 3. **Изучите руководства по веткам**: [Руководство по веткам](guides/GUIDE_BRANCHES.md)
 4. **Изучите цели обучения** в конкретных стендах:
-   - [Windows стенд](../stands/scenario-windows-stand/README.md)
-   - [Linux стенд](../stands/scenario-linux-stand/README.md)
+   - [Windows стенд](../stands/windows-stand/README.md)
+   - [Linux стенд](../stands/linux-stand/README.md)
 
 ### Для студентов
 
 1. **Ознакомьтесь с ошибками безопасности**: [Ошибки безопасности](technical/SECURITY_MISTAKES.md) для понимания изучаемых уязвимостей
 2. **Изучите быструю справку**: [Быстрая справка](guides/QUICK_REFERENCE.md)
 3. **Следуйте инструкциям в стендах**:
-   - [Windows стенд](../stands/scenario-windows-stand/README.md)
-   - [Linux стенд](../stands/scenario-linux-stand/README.md)
+   - [Windows стенд](../stands/windows-stand/README.md)
+   - [Linux стенд](../stands/linux-stand/README.md)
 
 ---
 
@@ -115,6 +115,10 @@
 - **Terraform** → [technical/TECHNOLOGIES.md](technical/TECHNOLOGIES.md#terraform)
 - **Ansible** → [technical/TECHNOLOGIES.md](technical/TECHNOLOGIES.md#ansible)
 - **Уязвимости** → [technical/SECURITY_MISTAKES.md](technical/SECURITY_MISTAKES.md)
+- **Требования/подготовка окружения** → [guides/PREREQUISITES.md](guides/PREREQUISITES.md)
+- **Доступ обучающихся к Proxmox (только свой стенд)** → [guides/PROXMOX_STUDENT_ACCESS.md](guides/PROXMOX_STUDENT_ACCESS.md)
+- **Сценарий обучения (VPN → Proxmox → ВМ стенда)** → [guides/TRAINING_SCENARIO.md](guides/TRAINING_SCENARIO.md)
+- **Сценарии уязвимостей (как включать и чему учить)** → [guides/VULNERABILITY_SCENARIOS.md](guides/VULNERABILITY_SCENARIOS.md)
 - **Стенды** → [../stands/](../stands/)
 
 ---

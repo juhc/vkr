@@ -1,0 +1,7 @@
+- name: Enable RemoteRegistry service (insecure)
+  ansible.windows.win_service:
+    name: RemoteRegistry
+    start_mode: auto
+    state: started
+  failed_when: false
+

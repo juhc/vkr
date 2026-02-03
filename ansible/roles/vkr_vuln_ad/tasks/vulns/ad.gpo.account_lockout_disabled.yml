@@ -1,0 +1,17 @@
+---
+- name: Disable account lockout policy in domain (best-effort)
+  ansible.windows.win_shell: |
+    try {
+      Import-Module ActiveDirectory -ErrorAction Stop
+      Set-ADDefaultDomainPasswordPolicy `
+        -Identity (Get-ADDomain).DistinguishedName `
+        -LockoutThreshold 0 `
+        -LockoutDuration ([TimeSpan]::Zero) `
+        -LockoutObservationWindow ([TimeSpan]::Zero) | Out-Null
+      "OK"
+    } catch {
+      "SKIP/ERR"
+    }
+  changed_when: false
+  failed_when: false
+

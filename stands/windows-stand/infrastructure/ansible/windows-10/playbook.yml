@@ -1,0 +1,41 @@
+---
+# Ansible playbook для настройки уязвимостей на рабочей станции Windows
+# Поддерживаемые ОС: Windows XP, Windows 7, Windows 10, Windows 11
+
+- name: Настройка уязвимостей на рабочей станции Windows
+  hosts: windows_workstation
+  gather_facts: yes
+  tasks:
+    - name: Проверка версии Windows
+      ansible.windows.win_shell: |
+        (Get-WmiObject Win32_OperatingSystem).Caption
+      register: windows_version
+      changed_when: false
+
+    - name: Вывод версии Windows
+      ansible.builtin.debug:
+        msg: "Обнаружена ОС: {{ windows_version.stdout }}"
+
+    - name: Настроить пользователей/группы (Windows WS)
+      ansible.builtin.import_role:
+        name: vkr_accounts
+      vars:
+        vkr_accounts_users: "{{ ((accounts_profiles | default({})).windows_workstation.users | default([])) }}"
+
+    - name: Присоединить Windows WS к домену AD
+      ansible.builtin.import_role:
+        name: vkr_ad_join
+      vars:
+        vkr_ad_join_enabled: "{{ (vkr_ad_join_profiles.windows_workstation | default(false)) | bool }}"
+
+    - name: Force gpupdate after domain join (best-effort)
+      ansible.windows.win_shell: |
+        gpupdate /force
+      changed_when: false
+      failed_when: false
+
+    - name: Применить профиль уязвимостей (Windows WS)
+      ansible.builtin.import_role:
+        name: vkr_vuln_windows
+      vars:
+        vuln_enabled: "{{ vuln_profiles.windows_workstation | default([]) }}"

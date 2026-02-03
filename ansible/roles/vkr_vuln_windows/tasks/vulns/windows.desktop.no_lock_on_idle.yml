@@ -1,0 +1,11 @@
+- name: Disable screen saver and password protection (policy-level, best-effort)
+  ansible.windows.win_regedit:
+    path: HKLM:\SOFTWARE\Policies\Microsoft\Windows\Control Panel\Desktop
+    name: "{{ item.name }}"
+    data: "{{ item.data }}"
+    type: string
+  loop:
+    - { name: "ScreenSaveActive", data: "0" }
+    - { name: "ScreenSaverIsSecure", data: "0" }
+    - { name: "ScreenSaveTimeOut", data: "0" }
+

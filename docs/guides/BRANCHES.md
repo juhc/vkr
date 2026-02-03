@@ -35,10 +35,10 @@ git checkout main
 git checkout scenario-isp-company
 
 # 2. Внесите изменения
-nano stands/scenario-windows-stand/README.md
+nano stands/windows-stand/README.md
 
 # 3. Закоммитьте изменения
-git add stands/scenario-windows-stand/README.md
+git add stands/windows-stand/README.md
 git commit -m "Описание изменений"
 
 # 4. Опубликуйте изменения
@@ -65,7 +65,7 @@ git push origin scenario-isp-company
 ### `scenario-isp-company`
 
 **Содержимое:**
-- Windows стенд (`stands/scenario-windows-stand/`)
+- Windows стенд (`stands/windows-stand/`)
 - Все общие компоненты (Terraform модули, Ansible роли, документация)
 
 **Описание сценария:**
@@ -76,14 +76,14 @@ git push origin scenario-isp-company
 **Использование:**
 ```bash
 git checkout scenario-isp-company
-cd stands/scenario-windows-stand
+cd stands/windows-stand
 # Следуйте инструкциям в README.md
 ```
 
 ### `scenario-office-organization`
 
 **Содержимое:**
-- Linux стенд (`stands/scenario-linux-stand/`)
+- Linux стенд (`stands/linux-stand/`)
 - Все общие компоненты (Terraform модули, Ansible роли, документация)
 - Terraform и Ansible конфигурации для развертывания
 
@@ -95,7 +95,7 @@ cd stands/scenario-windows-stand
 **Использование:**
 ```bash
 git checkout scenario-office-organization
-cd stands/scenario-linux-stand
+cd stands/linux-stand
 # Следуйте инструкциям в README.md или QUICKSTART.md
 ```
 
@@ -112,20 +112,20 @@ cd stands/scenario-linux-stand
 
 2. **Создание структуры сценария:**
    ```bash
-   mkdir -p stands/scenario-new-stand
+   mkdir -p stands/new-stand
    # Создайте необходимые файлы
    ```
 
 3. **Коммит изменений:**
    ```bash
-   git add stands/scenario-new-stand
+   git add stands/new-stand
    git commit -m "Добавлен новый сценарий"
    ```
 
 4. **Удаление других сценариев из ветки (опционально):**
    ```bash
    # Если хотите изолировать только свой сценарий
-   git rm -r stands/scenario-other-stand
+   git rm -r stands/other-stand
    git commit -m "Изоляция сценария в ветке"
    ```
 
@@ -156,7 +156,7 @@ cd stands/scenario-linux-stand
 
 2. **Развертывание:**
    ```bash
-   cd stands/scenario-windows-stand
+   cd stands/windows-stand
    # Следуйте инструкциям в DEPLOYMENT.md или QUICKSTART.md
    ```
 
@@ -193,7 +193,7 @@ stands/
 
 1. **Всегда работайте в ветке сценария** при разработке конкретного сценария
 2. **Синхронизируйте изменения** из main регулярно
-3. **Не коммитьте чувствительные данные** (пароли, ключи) - используйте Ansible Vault
+3. **Не коммитьте чувствительные данные** (пароли, ключи): храните их локально/в менеджере секретов (Ansible Vault — опционально)
 4. **Документируйте изменения** в сценариях в соответствующих README
 5. **Тестируйте развертывание** перед коммитом изменений
 

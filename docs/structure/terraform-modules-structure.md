@@ -349,7 +349,7 @@ monitoring/
 ### Пример использования в сценарии
 
 ```hcl
-# terraform/stands/scenario-1/main.tf
+# terraform/stands/stand-1/main.tf
 module "network" {
   source = "../../modules/network"
   

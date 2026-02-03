@@ -24,14 +24,14 @@ git branch --show-current
 git checkout scenario-isp-company
 
 # 2. Внесите изменения
-nano stands/scenario-windows-stand/README.md
+nano stands/windows-stand/README.md
 
 # 3. Проверьте изменения
 git status
 git diff
 
 # 4. Закоммитьте
-git add stands/scenario-windows-stand/README.md
+git add stands/windows-stand/README.md
 git commit -m "Описание изменений"
 
 # 5. Опубликуйте
@@ -62,7 +62,7 @@ git push origin scenario-office-organization
 
 ### ISP-компания
 ```
-stands/scenario-windows-stand/
+stands/windows-stand/
 ├── README.md
 ├── QUICKSTART.md
 ├── DEPLOYMENT.md
@@ -73,7 +73,7 @@ stands/scenario-windows-stand/
 
 ### Офисная организация
 ```
-stands/scenario-linux-stand/
+stands/linux-stand/
 ├── README.md
 ├── QUICKSTART.md
 ├── DEPLOYMENT.md
@@ -93,7 +93,7 @@ stands/scenario-linux-stand/
 git log --oneline
 
 # История конкретного файла
-git log --oneline stands/scenario-windows-stand/README.md
+git log --oneline stands/windows-stand/README.md
 
 # График всех веток
 git log --oneline --graph --all
