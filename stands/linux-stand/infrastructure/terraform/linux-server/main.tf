@@ -37,6 +37,19 @@ resource "proxmox_vm_qemu" "linux_server" {
   machine  = "q35"
   bootdisk = "scsi0"
   boot     = "order=scsi0;net0"
+
+  # Консоль/дисплей:
+  # - vga=serial0 часто ломает noVNC (консоль "отваливается"/постоянно переподключается)
+  # - фиксируем стандартный VGA, чтобы консоль Proxmox открывалась стабильно
+  vga {
+    type = "std"
+  }
+
+  # Оставляем serial0 как дополнительный канал для отладки (xterm.js), не мешает noVNC
+  serial {
+    id   = 0
+    type = "socket"
+  }
   
   # Ресурсы
   cores   = var.linux_server_cores
