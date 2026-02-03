@@ -34,6 +34,7 @@
 - **[Структура Ansible](structure/ansible-structure.md)** — организация Ansible конфигураций, ролей и плейбуков
 - **[Структура Terraform](structure/terraform-modules-structure.md)** — модули и конфигурации Terraform
 - **[Структура стендов](structure/scenarios-structure.md)** — организация учебных стендов
+- **[Структура репозитория (актуальная)](structure/repository-structure.md)** — дерево каталогов и точки входа проекта
 - **[Шаблон структуры проекта](structure/project-structure-template.md)** — рекомендуемая структура для новых проектов
 - **[Структура документации](structure/documentation-structure.md)** — организация документации в проекте
 
@@ -103,7 +104,7 @@
 - **Руководства** → [guides/](guides/)
 - **Техническая документация** → [technical/](technical/)
 - **Структура проекта** → [structure/](structure/)
-- **CI/CD** → [ci-cd/](ci-cd/)
+<!-- CI/CD документация удалена как неиспользуемая -->
 
 ### По темам
 

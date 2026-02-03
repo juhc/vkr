@@ -33,10 +33,9 @@
 - **[Структура Ansible](docs/structure/ansible-structure.md)** — организация Ansible конфигураций
 - **[Структура Terraform](docs/structure/terraform-modules-structure.md)** — модули и конфигурации
 - **[Структура сценариев](docs/structure/scenarios-structure.md)** — организация учебных сценариев
+- **[Структура репозитория (актуальная)](docs/structure/repository-structure.md)** — дерево каталогов и точки входа проекта
 - **[Шаблон структуры проекта](docs/structure/project-structure-template.md)** — рекомендуемая структура
 - **[Структура документации](docs/structure/documentation-structure.md)** — организация документации
-
-### CI/CD
 
 **Полный индекс документации**: [docs/README.md](docs/README.md)
 
@@ -51,7 +50,6 @@ vkr/
 │   ├── guides/                  # Руководства
 │   ├── structure/               # Структура проекта
 │   ├── technical/               # Техническая документация
-│   └── ci-cd/                   # CI/CD документация
 ├── terraform/                   # Terraform модули
 │   └── modules/                 # Переиспользуемые модули
 ├── ansible/                     # Ansible роли
