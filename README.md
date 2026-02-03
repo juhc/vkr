@@ -38,8 +38,6 @@
 
 ### CI/CD
 
-- **[CI/CD структура](docs/ci-cd/ci-cd-structure.md)** — автоматизация развертывания
-
 **Полный индекс документации**: [docs/README.md](docs/README.md)
 
 ---

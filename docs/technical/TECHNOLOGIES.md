@@ -256,14 +256,14 @@ terraform output -json | python3 generate_inventory.py > inventory.yml
 
 #### Основные скрипты:
 
-1. **`scripts/deploy.sh`** — автоматическое развертывание инфраструктуры:
+1. **`stands/*/infrastructure/scripts/deploy.sh`** — автоматическое развертывание инфраструктуры:
    - Проверка зависимостей
    - Инициализация Terraform
    - Развертывание ВМ
    - Генерация Ansible инвентаря
    - Применение конфигураций через Ansible
 
-2. **`scripts/destroy.sh`** — удаление инфраструктуры:
+2. **`terraform destroy`** (в каталоге конкретной ВМ/стенда) — удаление инфраструктуры:
    - Подтверждение операции
    - Удаление через Terraform
 
