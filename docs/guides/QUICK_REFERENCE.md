@@ -134,3 +134,26 @@ git commit -m "Разрешен конфликт"
 - [BRANCHES.md](BRANCHES.md) - Структура веток
 - [ANALYSIS_BRANCHES.md](ANALYSIS_BRANCHES.md) - Анализ подхода
 
+---
+
+## 🧰 Быстрое создание нового стенда
+
+Можно автоматически создать новый стенд на основе базового:
+
+```bash
+./tools/create-stand.sh \
+  --base stands/linux-stand \
+  --name linux-stand-02 \
+  --stand-id stand-02 \
+  --subnet 192.168.103.0/24 \
+  --pve-user student01@pve \
+  --pve-role StudentVM
+```
+
+Скрипт:
+- копирует структуру стенда,
+- обновляет `terraform.tfvars.example` (имена/IPv4/шлюз/префикс),
+- обновляет `ad.yml.example` для Windows‑стенда (stand-id/OU/компьютеры).
+- создаёт `accounts.yml` из `accounts.yml.example` (если его не было),
+- создаёт скрипт `infrastructure/scripts/proxmox_pool_acl.sh` для pool/ACL.
+

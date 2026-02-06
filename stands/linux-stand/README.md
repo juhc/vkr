@@ -127,6 +127,8 @@ ansible-playbook -i inventory.yml linux-server/playbook.yml
 
 Отредактируйте файл `infrastructure/ansible/group_vars/all/vulnerabilities.yml` для выбора уязвимостей, которые будут развернуты на каждой машине.
 
+Примечание: при запуске `infrastructure/scripts/deploy.sh` файл `inventory.yml` **генерируется автоматически** из Terraform outputs. Не редактируйте его вручную — при следующем деплое он будет перезаписан.
+
 ## Конфигурация машин
 
 ### Рабочая станция Linux Desktop

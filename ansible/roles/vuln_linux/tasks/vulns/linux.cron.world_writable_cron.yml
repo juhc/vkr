@@ -1,6 +1,6 @@
 - name: Create insecure root cron job with world-writable permissions
   ansible.builtin.copy:
-    dest: /etc/cron.d/vkr-insecure
+    dest: /etc/cron.d/training-insecure
     mode: "0777"
     content: |
       * * * * * root /tmp/backup.sh

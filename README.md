@@ -68,6 +68,80 @@ vkr/
 
 ---
 
+## 🧩 Развертывание инфраструктуры стенда
+
+Ниже короткий сценарий для Linux или Windows стенда. Полные инструкции и параметры — в README каждого стенда.
+
+Перед началом:
+- должен быть развернут **Proxmox VE** и доступен API (`https://<pve>:8006/api2/json`);
+- в Proxmox должен быть **загружен ISO образ ОС** (или подготовлен шаблон), который будет использоваться при создании ВМ.
+- на машине администратора должны быть установлены:
+  - **Terraform** (>= 1.0)
+  - **Ansible** (>= 2.9)
+  - **Python 3**
+  - **SSH клиент**
+  - **Packer** (только если собираете Windows/Linux шаблоны)
+
+Используемые технологии в проекте:
+- **Proxmox VE** — платформа виртуализации
+- **Terraform** — создание ВМ и инфраструктуры
+- **Ansible** — конфигурация ОС и внедрение уязвимостей
+- **Packer** — сборка шаблонов ВМ (опционально)
+- **Bash/Python** — скрипты автоматизации
+
+### Linux стенд (WS + Server)
+
+1) Подготовьте `terraform.tfvars`:
+```bash
+cd stands/linux-stand/infrastructure/terraform/linux-ws
+cp terraform.tfvars.example terraform.tfvars
+cd ../linux-server
+cp terraform.tfvars.example terraform.tfvars
+```
+
+2) (Опционально) настройте Ansible переменные:
+```
+stands/linux-stand/infrastructure/ansible/group_vars/all/accounts.yml
+stands/linux-stand/infrastructure/ansible/group_vars/all/vulnerabilities.yml
+```
+
+3) Запустите деплой:
+```bash
+cd ../../scripts
+./deploy.sh
+```
+
+### Windows стенд (WS + Server + DC)
+
+1) Подготовьте `terraform.tfvars`:
+```bash
+cd stands/windows-stand/infrastructure/terraform/windows-10
+cp terraform.tfvars.example terraform.tfvars
+cd ../windows-server
+cp terraform.tfvars.example terraform.tfvars
+cd ../domain-controller
+cp terraform.tfvars.example terraform.tfvars
+```
+
+2) (Опционально) настройте Ansible переменные:
+```
+stands/windows-stand/infrastructure/ansible/group_vars/all/accounts.yml
+stands/windows-stand/infrastructure/ansible/group_vars/all/vulnerabilities.yml
+stands/windows-stand/infrastructure/ansible/group_vars/all/ad.yml
+```
+
+3) Запустите деплой:
+```bash
+cd ../../scripts
+./deploy.sh
+```
+
+Примечания:
+- Для Windows стенда управление Ansible выполняется по SSH (OpenSSH Server в шаблоне).
+- `deploy.sh` генерирует `inventory.yml` автоматически из Terraform outputs.
+
+---
+
 ## 🛠️ Технологии
 
 - **Terraform** — автоматизация развертывания инфраструктуры

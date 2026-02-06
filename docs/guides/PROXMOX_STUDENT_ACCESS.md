@@ -10,7 +10,7 @@
 
 ### Какие права дать студенту (минимально)
 
-Создайте роль, например `VKR_StudentVM` со следующими правами:
+Создайте роль, например `StudentVM` со следующими правами:
 
 - **VM.Audit** — видеть VM/статусы
 - **VM.Console** — открывать noVNC/SPICE console
@@ -23,12 +23,12 @@
 
 1) **Datacenter → Pools → Create**: создайте пул, например `stand-linux-01` или `stand-windows-01`.
 2) Добавьте ВМ (VMID) стенда в пул.
-3) **Datacenter → Permissions → Roles → Create**: создайте роль `VKR_StudentVM` и отметьте нужные права (см. выше).
+3) **Datacenter → Permissions → Roles → Create**: создайте роль `StudentVM` и отметьте нужные права (см. выше).
 4) **Datacenter → Permissions → Users → Add**: создайте пользователя (например `student01@pve`) или подключите LDAP/AD realm.
 5) **Datacenter → Permissions → Add → Pool permission**:
    - Path: `/pool/stand-linux-01`
    - User: `student01@pve`
-   - Role: `VKR_StudentVM`
+   - Role: `StudentVM`
    - Propagate: ✅
 
 Результат: студент видит только ресурсы, попавшие в его pool.
@@ -39,7 +39,7 @@
 
 ```bash
 # 1) роль (минимальные права)
-pveum role add VKR_StudentVM -privs "VM.Audit VM.Console VM.PowerMgmt"
+pveum role add StudentVM -privs "VM.Audit VM.Console VM.PowerMgmt"
 
 # 2) пользователь (локальный realm pve)
 pveum user add student01@pve
@@ -50,7 +50,7 @@ pvesh create /pools -poolid stand-linux-01
 # далее добавьте VM в pool через UI (или pvesh, если у вас настроено)
 
 # 4) права на pool
-pveum aclmod /pool/stand-linux-01 -user student01@pve -role VKR_StudentVM
+pveum aclmod /pool/stand-linux-01 -user student01@pve -role StudentVM
 ```
 
 ### Как это сочетается с Ansible/Terraform

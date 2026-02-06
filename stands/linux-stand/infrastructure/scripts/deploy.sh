@@ -33,9 +33,14 @@ while [[ $# -gt 0 ]]; do
 done
 
 need() { command -v "$1" >/dev/null 2>&1 || { echo "Missing dependency: $1" >&2; exit 1; }; }
+need_file() { [[ -f "$1" ]] || { echo "Missing file: $1" >&2; exit 1; }; }
+warn() { echo "WARN: $1" >&2; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCENARIO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+ANS_DIR="$SCENARIO_ROOT/infrastructure/ansible"
+TF_DIR="$SCENARIO_ROOT/infrastructure/terraform"
+INV_SCRIPT="$SCRIPT_DIR/generate_inventory.py"
 
 echo "=========================================="
 echo "Деплой Linux стенда"
@@ -43,7 +48,7 @@ echo "  root: $SCENARIO_ROOT"
 echo "=========================================="
 
 if [[ $DO_TERRAFORM -eq 1 ]]; then need terraform; fi
-if [[ $DO_ANSIBLE -eq 1 ]]; then need ansible-playbook; fi
+if [[ $DO_ANSIBLE -eq 1 ]]; then need ansible-playbook; need python3; fi
 
 wait_for_ssh() {
   local host="$1" port="${2:-22}" timeout="${3:-300}"
@@ -94,8 +99,8 @@ fi
 if [[ $DO_TERRAFORM -eq 1 ]]; then
   echo ""
   echo "== Terraform =="
-  TF_DIR="$SCENARIO_ROOT/infrastructure/terraform"
-
+  need_file "$TF_DIR/linux-ws/terraform.tfvars"
+  need_file "$TF_DIR/linux-server/terraform.tfvars"
   for comp in linux-ws linux-server; do
     if [[ -d "$TF_DIR/$comp" ]]; then
       echo "-- terraform apply: $comp"
@@ -107,7 +112,17 @@ fi
 if [[ $DO_ANSIBLE -eq 1 ]]; then
   echo ""
   echo "== Ansible =="
-  ANS_DIR="$SCENARIO_ROOT/infrastructure/ansible"
+  need_file "$INV_SCRIPT"
+  if [[ ! -f "${ANSIBLE_KEY:-$HOME/.ssh/id_ed25519}" ]]; then
+    warn "SSH key not found: ${ANSIBLE_KEY:-$HOME/.ssh/id_ed25519}"
+  fi
+
+  # Генерация inventory из Terraform outputs
+  eval "$(python3 "$INV_SCRIPT" \
+    --linux-ws-dir "$TF_DIR/linux-ws" \
+    --linux-server-dir "$TF_DIR/linux-server" \
+    --inventory-path "$ANS_DIR/inventory.yml" \
+    --print-env)"
 
   # Ждём SSH (если IP дефолтные) — иначе Ansible сразу упадёт.
   echo "Waiting for SSH..."

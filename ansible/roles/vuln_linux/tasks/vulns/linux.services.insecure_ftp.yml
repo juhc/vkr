@@ -7,7 +7,7 @@
 - name: Configure vsftpd to allow anonymous and write (insecure)
   ansible.builtin.blockinfile:
     path: /etc/vsftpd.conf
-    marker: "# {mark} VKR VULN"
+    marker: "# {mark} TRAINING VULN"
     block: |
       anonymous_enable=YES
       local_enable=YES

@@ -33,9 +33,14 @@ while [[ $# -gt 0 ]]; do
 done
 
 need() { command -v "$1" >/dev/null 2>&1 || { echo "Missing dependency: $1" >&2; exit 1; }; }
+need_file() { [[ -f "$1" ]] || { echo "Missing file: $1" >&2; exit 1; }; }
+warn() { echo "WARN: $1" >&2; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCENARIO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+ANS_DIR="$SCENARIO_ROOT/infrastructure/ansible"
+TF_DIR="$SCENARIO_ROOT/infrastructure/terraform"
+INV_SCRIPT="$SCRIPT_DIR/generate_inventory.py"
 
 echo "=========================================="
 echo "Деплой Windows стенда"
@@ -44,7 +49,7 @@ echo "=========================================="
 
 if [[ $DO_TEMPLATES -eq 1 ]]; then need packer; fi
 if [[ $DO_TERRAFORM -eq 1 ]]; then need terraform; fi
-if [[ $DO_ANSIBLE -eq 1 ]]; then need ansible-playbook; fi
+if [[ $DO_ANSIBLE -eq 1 ]]; then need ansible-playbook; need python3; fi
 
 wait_for_ssh() {
   local host="$1" port="${2:-22}" timeout="${3:-600}"
@@ -92,7 +97,9 @@ fi
 if [[ $DO_TERRAFORM -eq 1 ]]; then
   echo ""
   echo "== Terraform =="
-  TF_DIR="$SCENARIO_ROOT/infrastructure/terraform"
+  need_file "$TF_DIR/windows-10/terraform.tfvars"
+  need_file "$TF_DIR/windows-server/terraform.tfvars"
+  need_file "$TF_DIR/domain-controller/terraform.tfvars"
   for comp in windows-10 windows-server domain-controller; do
     if [[ -d "$TF_DIR/$comp" ]]; then
       echo "-- terraform apply: $comp"
@@ -104,7 +111,19 @@ fi
 if [[ $DO_ANSIBLE -eq 1 ]]; then
   echo ""
   echo "== Ansible =="
-  ANS_DIR="$SCENARIO_ROOT/infrastructure/ansible"
+  need_file "$INV_SCRIPT"
+  if [[ -z "${ANSIBLE_PASSWORD:-}" ]]; then
+    warn "ANSIBLE_PASSWORD is empty; inventory will contain placeholder."
+  fi
+
+  # Генерация inventory из Terraform outputs
+  eval "$(python3 "$INV_SCRIPT" \
+    --windows-10-dir "$TF_DIR/windows-10" \
+    --windows-server-dir "$TF_DIR/windows-server" \
+    --domain-controller-dir "$TF_DIR/domain-controller" \
+    --inventory-path "$ANS_DIR/inventory.yml" \
+    --print-env)"
+
   echo "Waiting for SSH..."
   wait_for_ssh "$WINDOWS_WS_IP" 22 900 || true
   wait_for_ssh "$WINDOWS_SERVER_IP" 22 900 || true

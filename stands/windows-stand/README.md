@@ -200,6 +200,8 @@ ansible-playbook -i inventory.yml domain-controller/playbook.yml
 
 Отредактируйте файл `infrastructure/ansible/group_vars/all/vulnerabilities.yml` для выбора уязвимостей, которые будут развернуты на каждой машине.
 
+Примечание: при запуске `infrastructure/scripts/deploy.sh` файл `inventory.yml` **генерируется автоматически** из Terraform outputs. Не редактируйте его вручную — при следующем деплое он будет перезаписан.
+
 ## Конфигурация машин
 
 ### Рабочая станция Windows
@@ -225,7 +227,7 @@ ansible-playbook -i inventory.yml domain-controller/playbook.yml
 - Proxmox VE
 - Terraform >= 1.0
 - Ansible >= 2.9
-- WinRM доступ к Windows машинам
+- SSH доступ к Windows (OpenSSH Server в template) + PowerShell shell
 - Windows образы или шаблоны в Proxmox
 
 ## Дополнительная информация

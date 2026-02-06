@@ -1,12 +1,12 @@
-- name: Copy bash to /usr/local/bin/vkrbash (SUID backdoor example)
+- name: Copy bash to /usr/local/bin/trainingbash (SUID backdoor example)
   ansible.builtin.copy:
     src: /bin/bash
-    dest: /usr/local/bin/vkrbash
+    dest: /usr/local/bin/trainingbash
     mode: "0755"
     remote_src: true
 
-- name: Set SUID bit on /usr/local/bin/vkrbash (insecure)
+- name: Set SUID bit on /usr/local/bin/trainingbash (insecure)
   ansible.builtin.file:
-    path: /usr/local/bin/vkrbash
+    path: /usr/local/bin/trainingbash
     mode: "4755"
 
