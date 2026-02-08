@@ -1,0 +1,23 @@
+- name: Check GPO registry value for LLMNR (best-effort)
+  ansible.windows.win_shell: |
+    $gpoName = "{{ ad_gpo_prefix | default('training-ad.gpo.') }}llmnr_enabled"
+    try {
+      Import-Module GroupPolicy -ErrorAction Stop
+      $val = Get-GPRegistryValue -Name $gpoName -Key "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient" -ValueName "EnableMulticast" -ErrorAction Stop
+      if ($val.Value -eq 1) { "ENABLED" } else { "DISABLED" }
+    } catch {
+      "SKIP"
+    }
+  register: llmnr_state
+  changed_when: false
+
+- name: Verify LLMNR GPO state (best-effort)
+  ansible.builtin.assert:
+    that:
+      - (verify_mode == "enabled" and llmnr_state.stdout | trim == "ENABLED")
+        or
+        (verify_mode == "disabled" and llmnr_state.stdout | trim == "DISABLED")
+        or
+        (llmnr_state.stdout | trim == "SKIP")
+    fail_msg: >-
+      LLMNR GPO check failed for mode {{ verify_mode }}.

@@ -1,0 +1,24 @@
+- name: Check GPO registry values for WinRM insecure (best-effort)
+  ansible.windows.win_shell: |
+    $gpoName = "{{ ad_gpo_prefix | default('training-ad.gpo.') }}winrm_insecure"
+    try {
+      Import-Module GroupPolicy -ErrorAction Stop
+      $val1 = Get-GPRegistryValue -Name $gpoName -Key "HKLM\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service" -ValueName "AllowUnencryptedTraffic" -ErrorAction Stop
+      $val2 = Get-GPRegistryValue -Name $gpoName -Key "HKLM\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service\Auth" -ValueName "Basic" -ErrorAction Stop
+      if ($val1.Value -eq 1 -and $val2.Value -eq 1) { "ENABLED" } else { "DISABLED" }
+    } catch {
+      "SKIP"
+    }
+  register: winrm_state
+  changed_when: false
+
+- name: Verify WinRM GPO state (best-effort)
+  ansible.builtin.assert:
+    that:
+      - (verify_mode == "enabled" and winrm_state.stdout | trim == "ENABLED")
+        or
+        (verify_mode == "disabled" and winrm_state.stdout | trim == "DISABLED")
+        or
+        (winrm_state.stdout | trim == "SKIP")
+    fail_msg: >-
+      WinRM GPO check failed for mode {{ verify_mode }}.

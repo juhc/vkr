@@ -49,3 +49,17 @@ vuln_profiles:
     - ad.gpo.rdp_open_to_all
     - ad.gpo.winrm_insecure
     - ad.gpo.no_lock_on_idle
+
+vuln_verify:
+  windows_workstation:
+    enabled: []
+    disabled: []
+  windows_server:
+    enabled: []
+    disabled: []
+  domain_controller:
+    enabled: []
+    disabled: []
+  domain_controller_ad:
+    enabled: []
+    disabled: []

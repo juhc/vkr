@@ -1,0 +1,15 @@
+- name: Check NTLM compatibility level
+  ansible.windows.win_shell: |
+    $val = (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa").LmCompatibilityLevel
+    if ($val -eq 0) { "ENABLED" } else { "DISABLED" }
+  register: ntlm_state
+  changed_when: false
+
+- name: Verify NTLMv1 state
+  ansible.builtin.assert:
+    that:
+      - (verify_mode == "enabled" and ntlm_state.stdout | trim == "ENABLED")
+        or
+        (verify_mode == "disabled" and ntlm_state.stdout | trim == "DISABLED")
+    fail_msg: >-
+      NTLMv1 check failed for mode {{ verify_mode }}.

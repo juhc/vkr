@@ -1,0 +1,21 @@
+---
+# Проверка уязвимостей Domain Controller (enabled/disabled)
+- name: Verify Domain Controller vulnerabilities
+  hosts: domain_controller
+  gather_facts: yes
+  tasks:
+    - name: Verify DC OS-level profile (enabled/disabled)
+      ansible.builtin.import_role:
+        name: vuln_windows
+        tasks_from: verify
+      vars:
+        vuln_verify_enabled: "{{ (vuln_verify.domain_controller.enabled | default([])) }}"
+        vuln_verify_disabled: "{{ (vuln_verify.domain_controller.disabled | default([])) }}"
+
+    - name: Verify DC AD/GPO profile (enabled/disabled)
+      ansible.builtin.import_role:
+        name: vuln_ad
+        tasks_from: verify
+      vars:
+        vuln_verify_enabled: "{{ (vuln_verify.domain_controller_ad.enabled | default([])) }}"
+        vuln_verify_disabled: "{{ (vuln_verify.domain_controller_ad.disabled | default([])) }}"

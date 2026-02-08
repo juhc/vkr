@@ -1,0 +1,26 @@
+- name: Stat cron file
+  ansible.builtin.stat:
+    path: /etc/cron.d/training-insecure
+  register: cron_file
+  changed_when: false
+
+- name: Stat cron script
+  ansible.builtin.stat:
+    path: /tmp/backup.sh
+  register: cron_script
+  changed_when: false
+
+- name: Verify cron permissions
+  ansible.builtin.assert:
+    that:
+      - (verify_mode == "enabled"
+         and cron_file.stat.exists and cron_script.stat.exists
+         and cron_file.stat.mode == "0777" and cron_script.stat.mode == "0777")
+        or
+        (verify_mode == "disabled"
+         and (not cron_file.stat.exists
+              or cron_file.stat.mode != "0777"
+              or not cron_script.stat.exists
+              or cron_script.stat.mode != "0777"))
+    fail_msg: >-
+      Cron permissions check failed for mode {{ verify_mode }}.

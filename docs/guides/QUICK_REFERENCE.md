@@ -157,3 +157,24 @@ git commit -m "Разрешен конфликт"
 - создаёт `accounts.yml` из `accounts.yml.example` (если его не было),
 - создаёт скрипт `infrastructure/scripts/proxmox_pool_acl.sh` для pool/ACL.
 
+---
+
+## ✅ Автоматизированная проверка уязвимостей (verify)
+
+После развёртывания можно проверить, что уязвимости включены или исправлены.
+
+Пример (Linux):
+```bash
+cd stands/linux-stand/infrastructure/ansible
+ansible-playbook -i inventory.yml linux-server/verify.yml
+```
+
+Пример (Windows):
+```bash
+cd stands/windows-stand/infrastructure/ansible
+ansible-playbook -i inventory.yml windows-10/verify.yml
+ansible-playbook -i inventory.yml domain-controller/verify.yml
+```
+
+Списки для проверки задаются в `vuln_verify.*` внутри `group_vars/all/vulnerabilities.yml`.
+

@@ -1,0 +1,8 @@
+- name: Check sudoers drop-in for NOPASSWD
+  ansible.builtin.stat:
+    path: /etc/sudoers.d/99-training-nopasswd
+  register: sudoers_nopasswd
+  changed_when: false
+  failed_when: >-
+    (verify_mode == "enabled" and not sudoers_nopasswd.stat.exists) or
+    (verify_mode == "disabled" and sudoers_nopasswd.stat.exists)

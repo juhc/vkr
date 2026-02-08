@@ -1,0 +1,15 @@
+- name: Check Windows Firewall profiles
+  ansible.windows.win_shell: |
+    $enabled = (Get-NetFirewallProfile | Select-Object -ExpandProperty Enabled)
+    if ($enabled -contains $true) { "ENABLED" } else { "DISABLED" }
+  register: firewall_state
+  changed_when: false
+
+- name: Verify firewall state
+  ansible.builtin.assert:
+    that:
+      - (verify_mode == "enabled" and firewall_state.stdout | trim == "DISABLED")
+        or
+        (verify_mode == "disabled" and firewall_state.stdout | trim == "ENABLED")
+    fail_msg: >-
+      Windows Firewall check failed for mode {{ verify_mode }}.

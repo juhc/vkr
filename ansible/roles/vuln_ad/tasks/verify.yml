@@ -1,0 +1,28 @@
+- name: Validate vuln_verify lists
+  ansible.builtin.assert:
+    that:
+      - (vuln_verify_enabled | default([])) is iterable
+      - (vuln_verify_disabled | default([])) is iterable
+      - (vuln_verify_enabled | difference(vuln_ad_known)) | length == 0
+      - (vuln_verify_disabled | difference(vuln_ad_known)) | length == 0
+    fail_msg: >-
+      Unknown AD vulnerability IDs in verify lists.
+      Enabled: {{ (vuln_verify_enabled | difference(vuln_ad_known)) | join(', ') }}.
+      Disabled: {{ (vuln_verify_disabled | difference(vuln_ad_known)) | join(', ') }}.
+      Known: {{ vuln_ad_known | join(', ') }}
+
+- name: Verify enabled AD vulnerabilities
+  ansible.builtin.include_tasks: "verify/{{ item }}.yml"
+  loop: "{{ vuln_verify_enabled | default([]) }}"
+  loop_control:
+    label: "{{ item }}"
+  vars:
+    verify_mode: enabled
+
+- name: Verify disabled AD vulnerabilities (fixed)
+  ansible.builtin.include_tasks: "verify/{{ item }}.yml"
+  loop: "{{ vuln_verify_disabled | default([]) }}"
+  loop_control:
+    label: "{{ item }}"
+  vars:
+    verify_mode: disabled

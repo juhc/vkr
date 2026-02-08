@@ -1,0 +1,13 @@
+- name: Read sshd effective config (permitrootlogin)
+  ansible.builtin.command: sshd -T
+  register: sshd_t_root
+  changed_when: false
+
+- name: Verify root login setting
+  ansible.builtin.assert:
+    that:
+      - (verify_mode == "enabled" and (sshd_t_root.stdout is search('permitrootlogin yes')))
+        or
+        (verify_mode == "disabled" and (sshd_t_root.stdout is search('permitrootlogin (no|prohibit-password)')))
+    fail_msg: >-
+      SSH PermitRootLogin check failed for mode {{ verify_mode }}.

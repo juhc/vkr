@@ -1,0 +1,13 @@
+---
+# Проверка уязвимостей Windows WS (enabled/disabled)
+- name: Verify Windows WS vulnerabilities
+  hosts: windows_workstation
+  gather_facts: yes
+  tasks:
+    - name: Verify Windows WS profile (enabled/disabled)
+      ansible.builtin.import_role:
+        name: vuln_windows
+        tasks_from: verify
+      vars:
+        vuln_verify_enabled: "{{ (vuln_verify.windows_workstation.enabled | default([])) }}"
+        vuln_verify_disabled: "{{ (vuln_verify.windows_workstation.disabled | default([])) }}"

@@ -1,0 +1,15 @@
+- name: Check audit policy state
+  ansible.windows.win_shell: |
+    $count = (auditpol /get /category:* | Select-String "No Auditing").Count
+    if ($count -gt 0) { "DISABLED" } else { "ENABLED" }
+  register: audit_state
+  changed_when: false
+
+- name: Verify audit state
+  ansible.builtin.assert:
+    that:
+      - (verify_mode == "enabled" and audit_state.stdout | trim == "DISABLED")
+        or
+        (verify_mode == "disabled" and audit_state.stdout | trim == "ENABLED")
+    fail_msg: >-
+      Audit check failed for mode {{ verify_mode }}.

@@ -1,0 +1,28 @@
+- name: Validate vuln_verify lists
+  ansible.builtin.assert:
+    that:
+      - (vuln_verify_enabled | default([])) is iterable
+      - (vuln_verify_disabled | default([])) is iterable
+      - (vuln_verify_enabled | difference(vuln_windows_known)) | length == 0
+      - (vuln_verify_disabled | difference(vuln_windows_known)) | length == 0
+    fail_msg: >-
+      Unknown Windows vulnerability IDs in verify lists.
+      Enabled: {{ (vuln_verify_enabled | difference(vuln_windows_known)) | join(', ') }}.
+      Disabled: {{ (vuln_verify_disabled | difference(vuln_windows_known)) | join(', ') }}.
+      Known: {{ vuln_windows_known | join(', ') }}
+
+- name: Verify enabled Windows vulnerabilities
+  ansible.builtin.include_tasks: "verify/{{ item }}.yml"
+  loop: "{{ vuln_verify_enabled | default([]) }}"
+  loop_control:
+    label: "{{ item }}"
+  vars:
+    verify_mode: enabled
+
+- name: Verify disabled Windows vulnerabilities (fixed)
+  ansible.builtin.include_tasks: "verify/{{ item }}.yml"
+  loop: "{{ vuln_verify_disabled | default([]) }}"
+  loop_control:
+    label: "{{ item }}"
+  vars:
+    verify_mode: disabled

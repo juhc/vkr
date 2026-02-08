@@ -26,3 +26,11 @@ vuln_profiles:
     - linux.updates.disabled
     - linux.cron.world_writable_cron
 
+vuln_verify:
+  linux_workstation:
+    enabled: []
+    disabled: []
+  linux_server:
+    enabled: []
+    disabled: []
+

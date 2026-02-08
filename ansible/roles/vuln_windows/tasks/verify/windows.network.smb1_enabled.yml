@@ -1,0 +1,23 @@
+- name: Check SMBv1 feature state (best-effort)
+  ansible.windows.win_shell: |
+    $state = "Disabled"
+    try {
+      $s = (Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -ErrorAction Stop).State
+      if ($s -eq "Enabled") { $state = "Enabled" }
+    } catch {}
+    try {
+      $s2 = (Get-WindowsFeature -Name FS-SMB1 -ErrorAction Stop).InstallState
+      if ($s2 -eq "Installed") { $state = "Enabled" }
+    } catch {}
+    $state
+  register: smb1_state
+  changed_when: false
+
+- name: Verify SMBv1 state
+  ansible.builtin.assert:
+    that:
+      - (verify_mode == "enabled" and smb1_state.stdout | trim == "Enabled")
+        or
+        (verify_mode == "disabled" and smb1_state.stdout | trim != "Enabled")
+    fail_msg: >-
+      SMBv1 check failed for mode {{ verify_mode }}.

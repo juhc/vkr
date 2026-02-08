@@ -1,0 +1,14 @@
+---
+# Проверка уязвимостей Linux WS (enabled/disabled)
+- name: Verify Linux WS vulnerabilities
+  hosts: linux_workstation
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Verify Linux WS profile (enabled/disabled)
+      ansible.builtin.import_role:
+        name: vuln_linux
+        tasks_from: verify
+      vars:
+        vuln_verify_enabled: "{{ (vuln_verify.linux_workstation.enabled | default([])) }}"
+        vuln_verify_disabled: "{{ (vuln_verify.linux_workstation.disabled | default([])) }}"
