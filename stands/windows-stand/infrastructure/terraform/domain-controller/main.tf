@@ -26,6 +26,7 @@ resource "proxmox_vm_qemu" "domain_controller" {
   name        = var.dc_name
   description = "Domain Controller для обучения защите Active Directory"
   target_node = var.proxmox_node
+  pool        = var.proxmox_pool != "" ? var.proxmox_pool : null
   
   # Клонирование из шаблона или создание из ISO
   clone = var.template_name != "" ? var.template_name : null

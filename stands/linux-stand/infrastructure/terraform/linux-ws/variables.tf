@@ -22,6 +22,12 @@ variable "proxmox_node" {
   type        = string
 }
 
+variable "proxmox_pool" {
+  description = "Опционально: Proxmox pool для автоматической привязки ВМ (пусто = без pool)"
+  type        = string
+  default     = ""
+}
+
 variable "template_name" {
   description = "Имя шаблона для клонирования"
   type        = string

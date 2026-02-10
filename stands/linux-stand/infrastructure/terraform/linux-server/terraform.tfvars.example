@@ -4,6 +4,7 @@ proxmox_api_url          = "https://127.0.0.1:8006/api2/json"
 proxmox_api_token_id     = "packer@pam!packer-token"
 proxmox_api_token_secret = "PUT-YOUR-SECRET-HERE"
 proxmox_node             = "pve"
+proxmox_pool             = "" # например: "stand-linux-01" (пусто = без pool)
 storage                  = "local-lvm"
 proxmox_bridge           = "vmbr0"
 

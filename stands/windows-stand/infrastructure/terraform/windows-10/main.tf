@@ -26,6 +26,7 @@ resource "proxmox_vm_qemu" "windows_ws" {
   name        = var.windows_ws_name
   description = "Рабочая станция Windows для обучения защите ОС"
   target_node = var.proxmox_node
+  pool        = var.proxmox_pool != "" ? var.proxmox_pool : null
   
   # Клонирование из шаблона или создание из ISO
   clone = var.template_name != "" ? var.template_name : null

@@ -26,6 +26,7 @@ resource "proxmox_vm_qemu" "linux_ws" {
   name        = var.linux_ws_name
   description = "Рабочая станция Linux Desktop для обучения защите ОС"
   target_node = var.proxmox_node
+  pool        = var.proxmox_pool != "" ? var.proxmox_pool : null
   
   # Клонирование из шаблона
   clone = var.template_name

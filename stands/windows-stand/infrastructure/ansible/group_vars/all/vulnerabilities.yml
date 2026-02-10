@@ -7,12 +7,7 @@
 
 vuln_profiles:
   windows_workstation:
-    - windows.auth.weak_admin_password
-    - windows.auth.no_password_policy
-    - windows.remote.rdp_enabled
-    - windows.firewall.disabled
-    - windows.defender.disabled
-    - windows.updates.disabled
+    - windows.auth.no_password_policy.yml
 
   windows_server:
     - windows.auth.weak_admin_password

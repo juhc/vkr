@@ -26,6 +26,7 @@ resource "proxmox_vm_qemu" "linux_server" {
   name        = var.linux_server_name
   description = "Linux сервер для обучения защите ОС"
   target_node = var.proxmox_node
+  pool        = var.proxmox_pool != "" ? var.proxmox_pool : null
   
   # Клонирование из шаблона
   clone = var.template_name
