@@ -106,11 +106,6 @@ resource "proxmox_vm_qemu" "linux_ws" {
   qemu_os  = "l26"
   onboot   = true
   
-  lifecycle {
-    ignore_changes = [
-      network,
-    ]
-  }
 }
 
 # Выводы
