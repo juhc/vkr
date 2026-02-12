@@ -1,0 +1,109 @@
+- name: Ensure openssh-server is installed for SSH vulnerabilities
+  ansible.builtin.package:
+    name: openssh-server
+    state: present
+  when:
+    - (vuln_enabled | default([])) is iterable
+    - (vuln_enabled | intersect([
+        'linux.ssh.root_login',
+        'linux.ssh.password_auth',
+        'linux.ssh.no_rate_limit'
+      ])) | length > 0
+
+- name: Ensure sudo is installed for sudo/admin vulnerabilities
+  ansible.builtin.package:
+    name: sudo
+    state: present
+  when:
+    - (vuln_enabled | default([])) is iterable
+    - (vuln_enabled | intersect([
+        'linux.sudo.nopasswd',
+        'linux.auth.extra_admin_user'
+      ])) | length > 0
+
+- name: Ensure password policy package is installed (Debian family)
+  ansible.builtin.package:
+    name: libpam-pwquality
+    state: present
+  when:
+    - ansible_os_family == "Debian"
+    - (vuln_enabled | default([])) is iterable
+    - "'linux.auth.no_password_policy' in vuln_enabled"
+
+- name: Ensure fail2ban is installed for lockout vulnerability scenario (Debian family)
+  ansible.builtin.package:
+    name: fail2ban
+    state: present
+  when:
+    - ansible_os_family == "Debian"
+    - (vuln_enabled | default([])) is iterable
+    - "'linux.auth.lockout_disabled' in vuln_enabled"
+
+- name: Ensure vsftpd is installed for insecure FTP vulnerability
+  ansible.builtin.package:
+    name: vsftpd
+    state: present
+  when:
+    - (vuln_enabled | default([])) is iterable
+    - "'linux.services.insecure_ftp' in vuln_enabled"
+
+- name: Ensure telnet daemon is installed (Debian family)
+  ansible.builtin.package:
+    name: inetutils-telnetd
+    state: present
+  when:
+    - ansible_os_family == "Debian"
+    - (vuln_enabled | default([])) is iterable
+    - "'linux.services.insecure_telnet' in vuln_enabled"
+
+- name: Ensure telnet packages are installed (RHEL family)
+  ansible.builtin.package:
+    name:
+      - telnet-server
+      - xinetd
+    state: present
+  when:
+    - ansible_os_family == "RedHat"
+    - (vuln_enabled | default([])) is iterable
+    - "'linux.services.insecure_telnet' in vuln_enabled"
+
+- name: Ensure firewall package exists to reproducibly disable it (Debian family)
+  ansible.builtin.package:
+    name: ufw
+    state: present
+  when:
+    - ansible_os_family == "Debian"
+    - (vuln_enabled | default([])) is iterable
+    - "'linux.firewall.disabled' in vuln_enabled"
+
+- name: Ensure firewall package exists to reproducibly disable it (RHEL family)
+  ansible.builtin.package:
+    name: firewalld
+    state: present
+  when:
+    - ansible_os_family == "RedHat"
+    - (vuln_enabled | default([])) is iterable
+    - "'linux.firewall.disabled' in vuln_enabled"
+
+- name: Ensure logging packages exist to reproducibly disable them (Debian family)
+  ansible.builtin.package:
+    name:
+      - rsyslog
+      - auditd
+    state: present
+  when:
+    - ansible_os_family == "Debian"
+    - (vuln_enabled | default([])) is iterable
+    - "'linux.logging.disabled' in vuln_enabled"
+
+- name: Ensure logging packages exist to reproducibly disable them (RHEL family)
+  ansible.builtin.package:
+    name:
+      - rsyslog
+      - audit
+    state: present
+  when:
+    - ansible_os_family == "RedHat"
+    - (vuln_enabled | default([])) is iterable
+    - "'linux.logging.disabled' in vuln_enabled"
+

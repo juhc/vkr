@@ -9,6 +9,9 @@
       }}.
       Known: {{ vuln_linux_known | join(', ') }}
 
+- name: Ensure prerequisite packages for enabled vulnerabilities
+  ansible.builtin.include_tasks: prerequisites.yml
+
 - name: Apply enabled Linux vulnerabilities
   ansible.builtin.include_tasks: "vulns/{{ item }}.yml"
   loop: "{{ vuln_enabled }}"
