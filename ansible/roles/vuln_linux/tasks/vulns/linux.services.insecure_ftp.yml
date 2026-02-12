@@ -2,7 +2,6 @@
   ansible.builtin.package:
     name: vsftpd
     state: present
-  failed_when: false
 
 - name: Configure vsftpd to allow anonymous and write (insecure)
   ansible.builtin.blockinfile:
@@ -15,12 +14,10 @@
       anon_upload_enable=YES
       anon_mkdir_write_enable=YES
       chroot_local_user=NO
-  failed_when: false
 
 - name: Enable/Start vsftpd
   ansible.builtin.service:
     name: vsftpd
     state: started
     enabled: true
-  failed_when: false
 
