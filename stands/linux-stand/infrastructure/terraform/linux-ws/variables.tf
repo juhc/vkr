@@ -44,6 +44,12 @@ variable "proxmox_bridge" {
   default     = "vmbr0"
 }
 
+variable "proxmox_mgmt_bridge" {
+  description = "Опционально: второй bridge для management/SSH доступа (пусто = второй интерфейс отключён)"
+  type        = string
+  default     = ""
+}
+
 variable "use_dhcp" {
   description = "Если true — cloud-init получит IP по DHCP (ipconfig0=ip=dhcp). Если false — используется статический IP."
   type        = bool
@@ -115,4 +121,28 @@ variable "nameserver" {
   description = "DNS сервер"
   type        = string
   default     = "8.8.8.8"
+}
+
+variable "mgmt_use_dhcp" {
+  description = "Для второго интерфейса: если true — ipconfig1=ip=dhcp, иначе используется статический IP."
+  type        = bool
+  default     = false
+}
+
+variable "linux_ws_mgmt_ip" {
+  description = "Статический IP второго интерфейса Linux WS (используется при mgmt_use_dhcp=false)"
+  type        = string
+  default     = ""
+}
+
+variable "mgmt_cidr_prefix" {
+  description = "Префикс сети второго интерфейса (например 24)"
+  type        = number
+  default     = 24
+}
+
+variable "mgmt_gateway" {
+  description = "Опционально: шлюз второго интерфейса (пусто = без gw в ipconfig1)"
+  type        = string
+  default     = ""
 }

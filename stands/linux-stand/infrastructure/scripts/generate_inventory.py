@@ -35,6 +35,15 @@ def get_output(outputs: dict, key: str) -> str:
     return str(value)
 
 
+def get_output_optional(outputs: dict, key: str) -> str:
+    if key not in outputs:
+        return ""
+    value = outputs[key].get("value")
+    if isinstance(value, list):
+        return str(value[0]) if value else ""
+    return str(value) if value is not None else ""
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate Ansible inventory from Terraform outputs.")
     parser.add_argument("--linux-ws-dir", required=True)
@@ -50,8 +59,8 @@ def main() -> int:
     ws_outputs = run_terraform_output(args.linux_ws_dir)
     srv_outputs = run_terraform_output(args.linux_server_dir)
 
-    linux_ws_ip = get_output(ws_outputs, "linux_ws_ip")
-    linux_server_ip = get_output(srv_outputs, "linux_server_ip")
+    linux_ws_ip = get_output_optional(ws_outputs, "linux_ws_ssh_ip") or get_output(ws_outputs, "linux_ws_ip")
+    linux_server_ip = get_output_optional(srv_outputs, "linux_server_ssh_ip") or get_output(srv_outputs, "linux_server_ip")
 
     lines = [
         "---",

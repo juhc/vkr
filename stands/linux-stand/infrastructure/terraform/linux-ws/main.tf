@@ -21,6 +21,17 @@ provider "proxmox" {
   pm_debug            = false
 }
 
+locals {
+  ws_mgmt_enabled = trimspace(var.proxmox_mgmt_bridge) != ""
+  ws_mgmt_ipconfig = !local.ws_mgmt_enabled ? null : (
+    var.mgmt_use_dhcp ? "ip=dhcp" : (
+      var.mgmt_gateway != ""
+      ? "ip=${var.linux_ws_mgmt_ip}/${var.mgmt_cidr_prefix},gw=${var.mgmt_gateway}"
+      : "ip=${var.linux_ws_mgmt_ip}/${var.mgmt_cidr_prefix}"
+    )
+  )
+}
+
 # Рабочая станция Linux (Desktop)
 resource "proxmox_vm_qemu" "linux_ws" {
   name        = var.linux_ws_name
@@ -73,12 +84,21 @@ resource "proxmox_vm_qemu" "linux_ws" {
     model  = "virtio"
     bridge = var.proxmox_bridge
   }
+  dynamic "network" {
+    for_each = local.ws_mgmt_enabled ? [1] : []
+    content {
+      id     = 1
+      model  = "virtio"
+      bridge = var.proxmox_mgmt_bridge
+    }
+  }
   
   # Cloud-init для начальной настройки
   ciuser     = var.linux_ws_user
   cipassword = var.linux_ws_password != "" ? var.linux_ws_password : null
   sshkeys    = var.ssh_public_key != "" ? var.ssh_public_key : try(file(pathexpand("~/.ssh/id_ed25519.pub")), try(file(pathexpand("~/.ssh/id_rsa.pub")), ""))
   ipconfig0  = var.use_dhcp ? "ip=dhcp" : "ip=${var.linux_ws_ip}/${var.cidr_prefix},gw=${var.gateway}"
+  ipconfig1  = local.ws_mgmt_ipconfig
   nameserver = var.nameserver
   
   # Дополнительные настройки
@@ -102,4 +122,9 @@ output "linux_ws_ip" {
 output "linux_ws_name" {
   value       = proxmox_vm_qemu.linux_ws.name
   description = "Имя рабочей станции Linux"
+}
+
+output "linux_ws_ssh_ip" {
+  value       = local.ws_mgmt_enabled ? (var.mgmt_use_dhcp ? proxmox_vm_qemu.linux_ws.default_ipv4_address : var.linux_ws_mgmt_ip) : (proxmox_vm_qemu.linux_ws.default_ipv4_address != "" ? proxmox_vm_qemu.linux_ws.default_ipv4_address : var.linux_ws_ip)
+  description = "IP для SSH/Ansible (второй интерфейс при наличии, иначе основной)"
 }

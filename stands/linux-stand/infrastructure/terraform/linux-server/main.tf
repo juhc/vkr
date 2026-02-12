@@ -21,6 +21,17 @@ provider "proxmox" {
   pm_debug            = false
 }
 
+locals {
+  server_mgmt_enabled = trimspace(var.proxmox_mgmt_bridge) != ""
+  server_mgmt_ipconfig = !local.server_mgmt_enabled ? null : (
+    var.mgmt_use_dhcp ? "ip=dhcp" : (
+      var.mgmt_gateway != ""
+      ? "ip=${var.linux_server_mgmt_ip}/${var.mgmt_cidr_prefix},gw=${var.mgmt_gateway}"
+      : "ip=${var.linux_server_mgmt_ip}/${var.mgmt_cidr_prefix}"
+    )
+  )
+}
+
 # Linux сервер
 resource "proxmox_vm_qemu" "linux_server" {
   name        = var.linux_server_name
@@ -75,12 +86,21 @@ resource "proxmox_vm_qemu" "linux_server" {
     model  = "virtio"
     bridge = var.proxmox_bridge
   }
+  dynamic "network" {
+    for_each = local.server_mgmt_enabled ? [1] : []
+    content {
+      id     = 1
+      model  = "virtio"
+      bridge = var.proxmox_mgmt_bridge
+    }
+  }
   
   # Cloud-init для начальной настройки
   ciuser     = var.linux_server_user
   cipassword = var.linux_server_password != "" ? var.linux_server_password : null
   sshkeys    = var.ssh_public_key != "" ? var.ssh_public_key : try(file(pathexpand("~/.ssh/id_ed25519.pub")), try(file(pathexpand("~/.ssh/id_rsa.pub")), ""))
   ipconfig0  = var.use_dhcp ? "ip=dhcp" : "ip=${var.linux_server_ip}/${var.cidr_prefix},gw=${var.gateway}"
+  ipconfig1  = local.server_mgmt_ipconfig
   nameserver = var.nameserver
   
   # Дополнительные настройки
@@ -104,4 +124,9 @@ output "linux_server_ip" {
 output "linux_server_name" {
   value       = proxmox_vm_qemu.linux_server.name
   description = "Имя Linux сервера"
+}
+
+output "linux_server_ssh_ip" {
+  value       = local.server_mgmt_enabled ? (var.mgmt_use_dhcp ? proxmox_vm_qemu.linux_server.default_ipv4_address : var.linux_server_mgmt_ip) : (proxmox_vm_qemu.linux_server.default_ipv4_address != "" ? proxmox_vm_qemu.linux_server.default_ipv4_address : var.linux_server_ip)
+  description = "IP для SSH/Ansible (второй интерфейс при наличии, иначе основной)"
 }

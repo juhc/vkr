@@ -7,6 +7,8 @@ proxmox_node             = "pve"
 proxmox_pool             = "" # например: "stand-linux-01" (пусто = без pool)
 storage                  = "local-lvm"
 proxmox_bridge           = "vmbr0"
+# Опционально: второй интерфейс для management/SSH (внешняя сеть)
+proxmox_mgmt_bridge      = ""   # например "vmbr1"
 
 # Имя шаблона (cloud-init template, созданный через packer/cloudinit)
 template_name = "debian-cloudinit-template-uefi"
@@ -27,6 +29,12 @@ cidr_prefix = 24
 # Сеть
 gateway    = "192.168.102.1"
 nameserver = "8.8.8.8"
+
+# Второй интерфейс (management)
+mgmt_use_dhcp        = false
+linux_server_mgmt_ip = ""       # например "10.10.50.20"
+mgmt_cidr_prefix     = 24
+mgmt_gateway         = ""       # например "10.10.50.1"
 
 # SSH ключ (оставьте пустым для автоматического определения)
 ssh_public_key = ""
