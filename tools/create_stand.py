@@ -133,6 +133,11 @@ def ensure_ansible_vars(stand_dir: Path) -> None:
     if vuln_example.exists() and not vuln_target.exists():
         shutil.copyfile(vuln_example, vuln_target)
 
+    network_example = group_vars / "network.yml.example"
+    network_target = group_vars / "network.yml"
+    if network_example.exists() and not network_target.exists():
+        shutil.copyfile(network_example, network_target)
+
 
 def write_proxmox_acl_script(stand_dir: Path, stand_id: str, pve_user: str, pve_role: str) -> None:
     scripts_dir = stand_dir / "infrastructure/scripts"

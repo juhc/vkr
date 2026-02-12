@@ -1,0 +1,14 @@
+---
+# Сетевые настройки Windows-стенда для локальной сети и выхода в интернет.
+# Скопируйте в network.yml при необходимости переопределить значения:
+#   cp group_vars/all/network.yml.example group_vars/all/network.yml
+
+windows_network:
+  # Шлюз по умолчанию для подсети стенда
+  gateway: "192.168.101.1"
+
+  # Внешние DNS для резолвинга интернет-ресурсов.
+  # Для доменных хостов DNS=DC + эти forwarders (настраиваются на DC best-effort).
+  external_dns_servers:
+    - "1.1.1.1"
+    - "8.8.8.8"

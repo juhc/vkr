@@ -200,6 +200,10 @@ ansible-playbook -i inventory.yml domain-controller/playbook.yml
 
 Отредактируйте файл `infrastructure/ansible/group_vars/all/vulnerabilities.yml` для выбора уязвимостей, которые будут развернуты на каждой машине.
 
+Для сетевой доступности (локальная сеть + доступ в интернет) при необходимости создайте
+`infrastructure/ansible/group_vars/all/network.yml` из `network.yml.example` и задайте
+`windows_network.gateway` и `windows_network.external_dns_servers`.
+
 Примечание: при запуске `infrastructure/scripts/deploy.sh` файл `inventory.yml` **генерируется автоматически** из Terraform outputs. Не редактируйте его вручную — при следующем деплое он будет перезаписан.
 
 ## Конфигурация машин

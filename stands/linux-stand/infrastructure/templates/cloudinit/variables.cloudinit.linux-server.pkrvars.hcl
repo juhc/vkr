@@ -1,0 +1,13 @@
+# Cloud-init template vars: Linux Server (Debian 13 genericcloud)
+
+template_name = "linux-server-template"
+
+cloud_image_url      = "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
+cloud_image_filename = "debian-13-genericcloud-amd64.qcow2"
+
+cpu_cores = 2
+memory_mb = 2048
+
+ci_user = "ansible"
+# ssh_public_key_path = "C:\\Users\\you\\.ssh\\id_ed25519.pub"
+ipconfig0 = "ip=dhcp"

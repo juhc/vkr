@@ -16,6 +16,38 @@
     - name: Вывод версии Windows Server
       debug:
         msg: "Обнаружена ОС: {{ windows_version.stdout }}"
+
+    - name: Настроить сетевые параметры DC (gateway + DNS)
+      ansible.windows.win_shell: |
+        $desiredGateway = "{{ windows_gateway }}"
+        $dnsServers = '{{ windows_dns_servers | to_json }}' | ConvertFrom-Json
+        if ($dnsServers -is [string]) { $dnsServers = @($dnsServers) }
+
+        $cfg = Get-NetIPConfiguration |
+          Where-Object { $_.IPv4Address -and $_.NetAdapter.Status -eq 'Up' -and $_.InterfaceAlias -notmatch 'Loopback|vEthernet' } |
+          Select-Object -First 1
+
+        if (-not $cfg) {
+          throw "No active network adapter with IPv4 found."
+        }
+
+        if (-not $cfg.IPv4DefaultGateway -and $desiredGateway -ne "") {
+          New-NetRoute -DestinationPrefix "0.0.0.0/0" -InterfaceIndex $cfg.InterfaceIndex -NextHop $desiredGateway -RouteMetric 10 -ErrorAction SilentlyContinue | Out-Null
+        }
+
+        if ($dnsServers.Count -gt 0) {
+          Set-DnsClientServerAddress -InterfaceIndex $cfg.InterfaceIndex -ServerAddresses $dnsServers
+        }
+
+        $gw = (Get-NetIPConfiguration -InterfaceIndex $cfg.InterfaceIndex).IPv4DefaultGateway.NextHop
+        $dns = (Get-DnsClientServerAddress -InterfaceIndex $cfg.InterfaceIndex -AddressFamily IPv4).ServerAddresses
+        Write-Output ("Gateway={0}; DNS={1}" -f $gw, ($dns -join ","))
+      vars:
+        windows_gateway: "{{ ((windows_network | default({})).gateway | default('192.168.101.1')) }}"
+        windows_external_dns: "{{ ((windows_network | default({})).external_dns_servers | default(['1.1.1.1', '8.8.8.8'])) }}"
+        windows_dns_servers: "{{ [ad_dc_ip | default('192.168.101.30')] + windows_external_dns }}"
+      changed_when: false
+      failed_when: false
     
     - name: Проверка роли AD DS
       win_shell: |
@@ -44,6 +76,27 @@
           "SKIP: ActiveDirectory module/domain not available. Ensure DC template is already a working DC for {{ ad_domain_name | default('training.local') }}."
         }
       changed_when: false
+
+    - name: Настроить DNS forwarders на DC для доступа клиентов к интернет-ресурсам (best-effort)
+      ansible.windows.win_shell: |
+        try {
+          Import-Module DnsServer -ErrorAction Stop
+          $forwarders = '{{ windows_external_dns | to_json }}' | ConvertFrom-Json
+          if ($forwarders -is [string]) { $forwarders = @($forwarders) }
+          $existing = (Get-DnsServerForwarder -ErrorAction SilentlyContinue).IPAddress.IPAddressToString
+          foreach ($ip in $forwarders) {
+            if (-not ($existing -contains $ip)) {
+              Add-DnsServerForwarder -IPAddress $ip -PassThru -ErrorAction SilentlyContinue | Out-Null
+            }
+          }
+          Write-Output ("Forwarders: " + ((Get-DnsServerForwarder -ErrorAction SilentlyContinue).IPAddress.IPAddressToString -join ","))
+        } catch {
+          Write-Output "SKIP: DnsServer module/role not available."
+        }
+      vars:
+        windows_external_dns: "{{ ((windows_network | default({})).external_dns_servers | default(['1.1.1.1', '8.8.8.8'])) }}"
+      changed_when: false
+      failed_when: false
 
     - name: Применить профиль уязвимостей (Domain Controller, OS-level)
       ansible.builtin.import_role:

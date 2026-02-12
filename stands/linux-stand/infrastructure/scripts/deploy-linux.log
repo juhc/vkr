@@ -1,0 +1,5 @@
+==========================================
+Деплой Linux стенда
+  root: /d/zxc/vkr/stands/linux-stand
+==========================================
+Missing dependency: ansible-playbook

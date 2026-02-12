@@ -4,7 +4,7 @@
 # 2) НЕ храните здесь токены/пароли — для этого есть variables.secrets.pkrvars.hcl
 
 # Proxmox
-proxmox_api_url  = "https://127.0.0.1:8006/api2/json"
+proxmox_api_url  = "https://192.168.0.150:8006/api2/json"
 proxmox_node     = "pve"
 
 # Storage

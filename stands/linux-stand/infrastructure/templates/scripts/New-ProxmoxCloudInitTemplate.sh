@@ -107,11 +107,9 @@ curl_json() {
 wait_task() {
   local upid="$1"
   local enc
-  enc="$(python - <<PY 2>/dev/null || true
-import urllib.parse,sys
-print(urllib.parse.quote(sys.argv[1], safe=''))
-PY
-"$upid")"
+  # jq is already a required dependency in this script; use it for URL-encoding.
+  # This avoids heredoc argument-passing pitfalls and python/python3 availability issues.
+  enc="$(jq -rn --arg v "$upid" '$v|@uri' 2>/dev/null || true)"
   if [[ -z "$enc" ]]; then
     # fallback: minimal encoding (works for most UPID)
     enc="${upid//:/%3A}"
